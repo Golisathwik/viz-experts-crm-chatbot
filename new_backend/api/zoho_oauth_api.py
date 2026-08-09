@@ -135,7 +135,7 @@ async def zoho_callback(
             )
         )
 
-    except Exception:
+    except Exception as exc:
 
         return RedirectResponse(
             url=(
