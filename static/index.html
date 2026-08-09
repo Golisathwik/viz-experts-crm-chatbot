@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>viz Experts chatbot</title>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS (Utility class reference used for styling blocks) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d2d9f4",
+                        "on-secondary-container": "#54647a",
+                        "on-surface": "#131b2e",
+                        "on-tertiary-container": "#f8fafc",
+                        "surface": "#faf8ff",
+                        "surface-tint": "#0055d5",
+                        "surface-container-highest": "#dae2fd",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b3c5ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#faf8ff",
+                        "primary": "#0051cb",
+                        "on-tertiary-fixed": "#191c1e",
+                        "inverse-on-surface": "#eef0ff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dae2ff",
+                        "tertiary": "#575b5c",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#424655",
+                        "primary-fixed-dim": "#b3c5ff",
+                        "on-primary-container": "#faf8ff",
+                        "background": "#faf8ff",
+                        "inverse-surface": "#283044",
+                        "surface-container-low": "#f2f3ff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface-container": "#eaedff",
+                        "on-primary-fixed-variant": "#003fa3",
+                        "surface-variant": "#dae2fd",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-primary": "#ffffff",
+                        "on-background": "#131b2e",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e2e7ff",
+                        "outline-variant": "#c2c6d8",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-secondary-fixed": "#0b1c30",
+                        "outline": "#727687",
+                        "primary-container": "#0067ff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#001849",
+                        "secondary-container": "#d0e1fb",
+                        "secondary": "#505f76",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-container": "#707375"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "max-content-width": "1200px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "48px",
+                        "sm": "8px",
+                        "sidebar-width": "280px"
+                    },
+                    "fontFamily": {
+                        "body": ["Inter", "sans-serif"],
+                        "headline": ["Inter", "sans-serif"],
+                        "label": ["JetBrains Mono", "monospace"],
+                        "display": ["Inter", "sans-serif"],
+                        "headline-md": ["Inter", "sans-serif"],
+                        "label-caps": ["JetBrains Mono", "monospace"],
+                        "display-lg": ["Inter", "sans-serif"],
+                        "chat-bubble": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "body-sm": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="/static/app.css" rel="stylesheet"/>
+    <!-- Chart.js for premium visualization rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen">
+
+    <!-- Atmospheric background blobs (Universal) -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-secondary-container/20 blur-[100px] rounded-full"></div>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- 1. LOGIN VIEW -->
+    <!-- ========================================================================== -->
+    <div id="loginView" class="view-panel flex items-center justify-center min-h-screen p-md">
+        <main class="w-full max-w-[440px] flex flex-col items-center">
+            <!-- Brand Header -->
+            <header class="mb-lg text-center">
+                <img src="/static/images/logo.jpg" alt="viz Experts" class="w-14 h-14 rounded-2xl mx-auto mb-md shadow-lg object-cover"/>
+                <h1 class="font-headline-md text-headline-md text-on-surface mb-xs">viz Experts chatbot</h1>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">The AI-Powered Assistant for Zoho CRM</p>
+            </header>
+
+            <!-- Card Form -->
+            <div class="w-full glass-panel auth-card rounded-xl p-xl">
+                <div id="loginError" class="error-banner hidden mb-md"></div>
+                <form id="loginForm" class="space-y-lg">
+                    <!-- Email Field -->
+                    <div class="space-y-xs">
+                        <label class="font-label-caps text-label-caps text-on-surface-variant px-xs" for="loginEmail">EMAIL ID</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-md flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">mail</span>
+                            </div>
+                            <input class="w-full h-12 pl-11 pr-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-lg text-body-lg outline-none" id="loginEmail" placeholder="name@company.com" required type="email"/>
+                        </div>
+                    </div>
+                    <!-- Password Field -->
+                    <div class="space-y-xs">
+                        <label class="font-label-caps text-label-caps text-on-surface-variant px-xs" for="loginPassword">PASSWORD</label>
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-md flex items-center pointer-events-none text-outline group-focus-within:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">lock</span>
+                            </div>
+                            <input class="w-full h-12 pl-11 pr-12 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-lg text-body-lg outline-none" id="loginPassword" placeholder="••••••••" required type="password"/>
+                            <button class="absolute inset-y-0 right-0 pr-md flex items-center text-outline hover:text-on-surface transition-colors" type="button" onclick="togglePasswordVisibility('loginPassword', 'loginPassIcon')">
+                                <span class="material-symbols-outlined text-[20px]" id="loginPassIcon">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Login Button -->
+                    <button class="w-full h-14 bg-primary text-on-primary font-headline-md text-body-lg rounded-lg shadow-md hover:bg-primary-container hover:shadow-lg transition-all transform active:scale-[0.98] mt-sm flex items-center justify-center gap-sm" type="submit" id="loginBtn">
+                        Login
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </form>
+                <!-- Links -->
+                <div class="flex items-center justify-between mt-lg">
+                    <a class="font-body-sm text-body-sm text-primary hover:text-primary-container transition-colors font-medium cursor-pointer" onclick="handleForgotPassword()">Forgot Password?</a>
+                    <div class="flex items-center gap-xs">
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">New user?</span>
+                        <a class="font-body-sm text-body-sm text-primary hover:text-primary-container transition-colors font-bold underline underline-offset-4 cursor-pointer" onclick="switchView('signup')">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Trust Indicator -->
+            <footer class="mt-xl flex flex-col items-center gap-md">
+                <div class="flex items-center gap-md opacity-40">
+                    <span class="font-label-caps text-label-caps">LOCAL SQLITE SECURE</span>
+                    <div class="w-1 h-1 bg-outline rounded-full"></div>
+                    <span class="font-label-caps text-label-caps">GROQ AI POWERED</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- 2. SIGNUP VIEW -->
+    <!-- ========================================================================== -->
+    <div id="signupView" class="view-panel hidden flex items-center justify-center min-h-screen p-md">
+        <main class="w-full max-w-[480px] flex flex-col items-center">
+            <!-- Brand Header -->
+            <div class="mb-lg text-center">
+                <img src="/static/images/logo.jpg" alt="viz Experts" class="w-14 h-14 rounded-2xl mx-auto mb-md shadow-lg object-cover"/>
+                <h1 class="font-headline-md text-headline-md text-on-surface mb-xs">viz Experts chatbot</h1>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">Intelligent Chat Workspace for CRM Data</p>
+            </div>
+
+            <!-- Card Form -->
+            <div class="w-full glass-panel auth-card border border-outline-variant/30 rounded-xl shadow-2xl p-xl">
+                <div class="mb-lg">
+                    <h2 class="font-headline-md text-headline-md text-on-surface">Create your account</h2>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-base">Get instant insights from your leads and deals</p>
+                </div>
+                <div id="signupError" class="error-banner hidden mb-md"></div>
+                <form id="signupForm" class="space-y-md">
+                    <!-- Full Name -->
+                    <div class="space-y-base">
+                        <label class="font-label-caps text-label-caps text-on-surface-variant" for="signupName">Full Name</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">person</span>
+                            <input class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-outline-variant" id="signupName" placeholder="John Doe" required type="text"/>
+                        </div>
+                    </div>
+                    <!-- Email ID -->
+                    <div class="space-y-base">
+                        <label class="font-label-caps text-label-caps text-on-surface-variant" for="signupEmail">Email ID</label>
+                        <div class="relative group">
+                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">mail</span>
+                            <input class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-outline-variant" id="signupEmail" placeholder="john.doe@company.com" required type="email"/>
+                        </div>
+                    </div>
+                    <!-- Password Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                        <!-- Password -->
+                        <div class="space-y-base">
+                            <label class="font-label-caps text-label-caps text-on-surface-variant" for="signupPassword">Password</label>
+                            <div class="relative group">
+                                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">lock</span>
+                                <input class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-outline-variant" id="signupPassword" placeholder="••••••••" required type="password"/>
+                            </div>
+                        </div>
+                        <!-- Confirm Password -->
+                        <div class="space-y-base">
+                            <label class="font-label-caps text-label-caps text-on-surface-variant" for="signupConfirmPassword">Confirm Password</label>
+                            <div class="relative group">
+                                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">verified_user</span>
+                                <input class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-outline-variant" id="signupConfirmPassword" placeholder="••••••••" required type="password"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CTA Button -->
+                    <button class="w-full h-14 bg-primary hover:bg-primary-container text-on-primary font-headline-md text-headline-md rounded-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98] mt-md" type="submit" id="signupBtn">
+                        Create Account
+                    </button>
+                </form>
+                <div class="mt-lg pt-lg border-t border-outline-variant/30 text-center">
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">
+                        Already have an account? 
+                        <a class="text-primary font-semibold hover:underline cursor-pointer" onclick="switchView('login')">Sign In</a>
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- 3. CONFIGURATION VIEW -->
+    <!-- ========================================================================== -->
+    <div id="configView" class="view-panel hidden flex items-center justify-center min-h-screen p-md">
+        <main class="w-full max-w-[550px] flex flex-col items-center">
+            <!-- Brand Header -->
+            <div class="mb-lg text-center">
+                <img src="/static/images/logo.jpg" alt="viz Experts" class="w-14 h-14 rounded-2xl mx-auto mb-md shadow-lg object-cover"/>
+                <h1 class="font-headline-md text-headline-md text-on-surface">API Configurations</h1>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-sm">Setup Zoho CRM and Groq LLM API Credentials</p>
+            </div>
+
+            <!-- Configuration Card -->
+            <div class="w-full bg-white border border-outline-variant rounded-xl p-xl shadow-sm relative overflow-hidden group">
+                <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl transition-colors duration-700"></div>
+                
+                <div id="configError" class="error-banner hidden mb-md"></div>
+                <div id="configSuccess" class="success-banner hidden mb-md"></div>
+                
+                <form id="configForm" class="space-y-lg">
+                    <!-- Zoho OAuth Connection -->
+                    <div class="space-y-base">
+                        <div class="flex justify-between items-center">
+                            <label class="font-label-caps text-label-caps text-on-surface-variant">
+                                ZOHO CRM CONNECTION
+                            </label>
+
+                            <span
+                                id="zohoStatusBadge"
+                                class="status-indicator status-disconnected"
+                            >
+                                NOT CONNECTED
+                            </span>
+                        </div>
+
+                        <!-- Client ID -->
+                        <div class="space-y-xs">
+                            <label
+                                class="text-xs font-semibold text-on-surface-variant"
+                                for="configZohoClientId"
+                            >
+                                Zoho Client ID
+                            </label>
+
+                            <input
+                                class="w-full h-14 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-sm font-body-lg text-body-lg transition-all"
+                                id="configZohoClientId"
+                                placeholder="Enter your Zoho Client ID"
+                                type="text"
+                                autocomplete="off"
+                            />
+                        </div>
+
+                        <!-- Client Secret -->
+                        <div class="space-y-xs">
+                            <label
+                                class="text-xs font-semibold text-on-surface-variant"
+                                for="configZohoClientSecret"
+                            >
+                                Zoho Client Secret
+                            </label>
+
+                            <div class="relative">
+                                <input
+                                    class="w-full h-14 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-sm font-body-lg text-body-lg transition-all pr-16"
+                                    id="configZohoClientSecret"
+                                    placeholder="Enter your Zoho Client Secret"
+                                    type="password"
+                                    autocomplete="off"
+                                />
+
+                                <button
+                                    class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary"
+                                    type="button"
+                                    onclick="togglePasswordVisibility('configZohoClientSecret', 'zohoSecretEye')"
+                                >
+                                    <span
+                                        class="material-symbols-outlined"
+                                        id="zohoSecretEye"
+                                    >
+                                        visibility
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- OAuth Connect Button -->
+                        <div class="flex gap-2">
+                            <button
+                                type="button"
+                                class="w-full h-12 bg-primary text-on-primary rounded-lg font-semibold hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                onclick="connectZohoCRM()"
+                                id="connectZohoBtn"
+                            >
+                                <span class="material-symbols-outlined">
+                                    link
+                                </span>
+
+                                <span>Connect Zoho CRM</span>
+                            </button>
+                        </div>
+
+                        <p class="text-xs text-on-surface-variant leading-relaxed">
+                            Create a Server-based Application in Zoho API Console and enter its
+                            Client ID and Client Secret above. Then connect your Zoho CRM account.
+                        </p>
+                    </div>
+
+                    <!-- Groq Key Field -->
+                    <div class="space-y-base pt-3 border-t border-outline-variant/30">
+                        <div class="flex justify-between items-center">
+                            <label class="font-label-caps text-label-caps text-on-surface-variant" for="configGroqKey">GROQ LLM API KEY</label>
+                            <span id="groqStatusBadge" class="status-indicator status-disconnected">DISCONNECTED</span>
+                        </div>
+                        <div class="relative">
+                            <input class="w-full h-14 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-sm font-body-lg text-body-lg transition-all pr-16" id="configGroqKey" placeholder="gsk_..." type="password"/>
+                            <button class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary" type="button" onclick="togglePasswordVisibility('configGroqKey', 'groqEye')">
+                                <span class="material-symbols-outlined" id="groqEye">visibility</span>
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" class="btn-secondary flex-1 py-2 text-xs font-semibold rounded" onclick="testConnection('groq')" id="testGroqBtn">
+                                Test Groq Connection
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Key Field -->
+                    <div class="space-y-base pt-3 border-t border-outline-variant/30">
+                        <div class="flex justify-between items-center">
+                            <label class="font-label-caps text-label-caps text-on-surface-variant" for="configGeminiKey">GEMINI LLM API KEY</label>
+                            <span id="geminiStatusBadge" class="status-indicator status-disconnected">DISCONNECTED</span>
+                        </div>
+                        <div class="relative">
+                            <input class="w-full h-14 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-sm font-body-lg text-body-lg transition-all pr-16" id="configGeminiKey" placeholder="AIzaSy..." type="password"/>
+                            <button class="absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary" type="button" onclick="togglePasswordVisibility('configGeminiKey', 'geminiEye')">
+                                <span class="material-symbols-outlined" id="geminiEye">visibility</span>
+                            </button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" class="btn-secondary flex-1 py-2 text-xs font-semibold rounded" onclick="testConnection('gemini')" id="testGeminiBtn">
+                                Test Gemini Connection
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-sm pt-4 border-t border-outline-variant/30">
+                        <button class="w-full h-14 bg-primary text-on-primary rounded-lg font-headline-md-mobile flex items-center justify-center gap-md hover:bg-primary-container active:scale-[0.98] transition-all" type="submit" id="saveConfigBtn">
+                            <span>Save Configuration</span>
+                            <span class="material-symbols-outlined">save</span>
+                        </button>
+                        <button class="w-full h-12 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg font-semibold flex items-center justify-center gap-md active:scale-[0.98] transition-all mt-1" type="button" onclick="continueToChat()" id="continueBtn">
+                            <span>Continue to Chat</span>
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- 4. MAIN CHAT VIEW -->
+    <!-- ========================================================================== -->
+    <div id="chatView" class="view-panel hidden flex h-screen w-full overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside class="w-[280px] bg-surface-container-low border-r border-outline-variant flex flex-col p-md overflow-hidden flex-shrink-0 h-full">
+            <!-- Title Header -->
+            <div class="mb-lg px-2 flex items-center gap-2">
+                <img src="/static/images/logo.jpg" alt="viz Experts" class="w-8 h-8 rounded object-cover shadow-sm"/>
+                <div>
+                    <h1 class="font-headline-md text-md font-bold text-primary leading-tight">viz Experts</h1>
+                    <p class="text-on-surface-variant text-[11px] font-label-caps uppercase tracking-wider">CRM Assistant</p>
+                </div>
+            </div>
+
+            <!-- New Chat CTA -->
+            <button class="flex items-center justify-center gap-2 w-full py-3 mb-md bg-secondary-container text-primary font-bold rounded-xl hover:bg-surface-container-highest transition-all hover-active" onclick="startNewChat()">
+                <span class="material-symbols-outlined">add_comment</span>
+                <span class="font-body-sm text-body-sm">New Chat</span>
+            </button>
+
+            <!-- Chat History Scrollable -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar mb-md">
+                <h2 class="px-2 mb-2 font-label-caps text-label-caps text-on-surface-variant opacity-60 uppercase">Recent Chats</h2>
+                <nav id="chatHistoryList" class="space-y-1">
+                    <!-- Loaded dynamically via js -->
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer Controls -->
+            <div class="pt-4 border-t border-outline-variant space-y-1">
+                <a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-colors cursor-pointer" onclick="openSettingsModal()">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="font-body-sm text-body-sm">Settings</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-colors cursor-pointer" onclick="handleLogout()">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-body-sm text-body-sm">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN AREA -->
+        <main class="flex-1 h-full flex flex-col relative overflow-hidden bg-background">
+            
+            <!-- Top bar -->
+            <header class="h-16 border-b border-outline-variant/30 flex justify-between items-center px-lg bg-surface/80 backdrop-blur-md z-10 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wider">AI RAG Sandbox</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Connections Status badges -->
+                    <div class="flex items-center gap-3 text-xs bg-surface-container-low px-3 py-1.5 rounded-full border border-outline-variant/30">
+                        <span class="flex items-center gap-1">
+                            <span id="topZohoIndicator" class="w-2 h-2 rounded-full bg-error"></span> Zoho
+                        </span>
+                        <span class="text-gray-300">|</span>
+                        <span class="flex items-center gap-1">
+                            <span id="topGroqIndicator" class="w-2 h-2 rounded-full bg-error"></span> Groq
+                        </span>
+                        <span class="text-gray-300">|</span>
+                        <span class="flex items-center gap-1">
+                            <span id="topGeminiIndicator" class="w-2 h-2 rounded-full bg-error"></span> Gemini
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Chat Area Messages (Scrollable) -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar px-md py-lg" id="chatMessagesArea">
+                <!-- Welcome instructions (if empty) or messages dynamically loaded -->
+                <div class="max-w-[700px] mx-auto text-center py-xl mt-12" id="welcomePanel">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-container rounded-3xl mb-6 shadow-sm">
+                        <span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                    </div>
+                    <h2 class="font-display-lg text-display-lg text-on-surface mb-2">Query Zoho CRM with Natural Language</h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto">
+                        Ask about leads, deals, pipelines, and activities in real time.
+                    </p>
+
+                    <!-- Prompt Suggestion Chips -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-10 text-left">
+                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('Show all leads')">
+                            <span class="material-symbols-outlined text-primary">groups</span>
+                            <div>
+                                <p class="font-body-sm text-body-sm font-semibold">Show all leads</p>
+                                <p class="text-[11px] text-on-surface-variant">Review top sales prospects</p>
+                            </div>
+                        </button>
+                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('Show open deals')">
+                            <span class="material-symbols-outlined text-primary">trending_up</span>
+                            <div>
+                                <p class="font-body-sm text-body-sm font-semibold">Show open deals</p>
+                                <p class="text-[11px] text-on-surface-variant">Review deals in progress</p>
+                            </div>
+                        </button>
+                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('Pipeline summary')">
+                            <span class="material-symbols-outlined text-primary">analytics</span>
+                            <div>
+                                <p class="font-body-sm text-body-sm font-semibold">Pipeline summary</p>
+                                <p class="text-[11px] text-on-surface-variant">Check value across pipeline stages</p>
+                            </div>
+                        </button>
+                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('CRM statistics')">
+                            <span class="material-symbols-outlined text-primary">emoji_events</span>
+                            <div>
+                                <p class="font-body-sm text-body-sm font-semibold">CRM statistics</p>
+                                <p class="text-[11px] text-on-surface-variant">Show counts, win rates & deal averages</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="max-w-[700px] mx-auto space-y-md" id="chatMessageList">
+                    <!-- Dynamic chat messages go here -->
+                </div>
+            </div>
+
+            <!-- Bottom Prompt Input Area -->
+            <div class="w-full flex flex-col items-center pb-8 px-md bg-gradient-to-t from-background via-background to-transparent flex-shrink-0">
+                <div class="max-w-[700px] w-full relative">
+                    <!-- File Attachment Preview Banner (Hidden by default) -->
+                    <div id="fileUploadPreview" class="hidden mb-2 bg-white border border-outline-variant rounded-xl p-3 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-primary" id="fileIcon">description</span>
+                            <div class="text-left">
+                                <p class="text-xs font-semibold text-on-surface truncate max-w-[400px]" id="fileNameLabel">file.pdf</p>
+                                <p class="text-[10px] text-on-surface-variant" id="fileSizeLabel">124 KB</p>
+                            </div>
+                        </div>
+                        <button class="text-on-surface-variant hover:text-red-500 p-1" onclick="clearFileAttachment()">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Input Bar -->
+                    <div class="bg-white border border-outline-variant/60 rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] focus-within:border-primary/30 transition-all p-2 max-w-[700px] w-full">
+                        <form id="chatForm" class="flex items-center gap-2 p-0.5" onsubmit="handleChatSubmit(event)">
+                            <!-- Hidden inputs for file -->
+                            <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.txt,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.webp" onchange="handleFileChange(event)"/>
+                            
+                            <!-- Left attachment action -->
+                            <button type="button" id="attachBtn" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all flex-shrink-0" title="Upload File" onclick="document.getElementById('fileInput').click()">
+                                <span class="material-symbols-outlined text-[22px]">attach_file</span>
+                            </button>
+                            
+                            <!-- Textarea -->
+                            <textarea class="flex-1 max-h-48 py-2 px-3 border-none focus:ring-0 font-body-lg text-body-lg resize-none placeholder:text-outline outline-none bg-transparent" placeholder="Ask about leads, deal status, pipeline..." rows="1" id="chatInputField" onkeydown="handleTextareaKeydown(event)"></textarea>
+                            
+                            <!-- Recording Timer overlay (Hidden by default) -->
+                            <div id="recordingTimerOverlay" class="hidden flex items-center justify-between gap-4 px-5 py-1.5 bg-red-50/70 border border-red-200/80 rounded-full flex-1 h-10">
+                                <div class="flex items-center gap-2 text-red-600 font-semibold text-sm">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
+                                    <span>Recording</span>
+                                    <span id="recordingTimerValue" class="font-mono">00:00</span>
+                                </div>
+                                <button type="button" class="flex items-center gap-1.5 px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer" onclick="stopRecording()">
+                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">stop</span>
+                                    <span>Stop Recording</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Right actions -->
+                            <div class="flex items-center gap-1.5 flex-shrink-0">
+                                <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all" title="Voice Input" id="micBtn" onclick="toggleMicrophone()">
+                                    <span class="material-symbols-outlined text-[22px]" id="micIcon">mic</span>
+                                </button>
+                                <button type="submit" class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-white hover:bg-primary-container transition-all shadow-sm hover:shadow active:scale-95" title="Send" id="sendBtn">
+                                    <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- 5. SETTINGS MODAL OVERLAY -->
+    <!-- ========================================================================== -->
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-md bg-black/30 backdrop-blur-sm">
+        <div class="w-full max-w-[500px] bg-white border border-outline-variant rounded-2xl shadow-2xl p-xl flex flex-col gap-lg relative animate-fade-in">
+            
+            <header class="flex justify-between items-center pb-md border-b border-outline-variant/30">
+                <h3 class="font-headline-md text-lg font-bold text-on-surface">System Settings</h3>
+                <button class="text-on-surface-variant hover:text-on-surface" onclick="closeSettingsModal()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </header>
+
+            <div id="settingsError" class="error-banner hidden"></div>
+            <div id="settingsSuccess" class="success-banner hidden"></div>
+
+            <div class="flex-1 overflow-y-auto space-y-lg max-h-[70vh] pr-1">
+                <!-- 1. API Keys Settings -->
+                <form id="settingsKeysForm" onsubmit="saveSettingsKeys(event)" class="space-y-md">
+                    <h4 class="text-xs font-label-caps text-primary border-b border-gray-100 pb-1 uppercase">Update Connection Keys</h4>
+                    <!-- Zoho CRM OAuth Status -->
+                    <div class="space-y-xs">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-semibold text-on-surface-variant">
+                                Zoho CRM
+                            </label>
+
+                            <span
+                                id="settingsZohoStatus"
+                                class="status-indicator status-disconnected"
+                            >
+                                NOT CONNECTED
+                            </span>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3 p-3 bg-surface-container rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">
+                                    cloud
+                                </span>
+
+                                <span class="text-sm text-on-surface-variant">
+                                    Zoho CRM OAuth connection
+                                </span>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="settingsZohoReconnectBtn"
+                                class="px-4 py-2 bg-primary text-white rounded-lg text-xs font-semibold hover:bg-primary-container transition-all"
+                                onclick="reconnectZohoFromSettings()"
+                            >
+                                Reconnect
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-xs">
+                        <label class="text-xs font-semibold text-on-surface-variant" for="settingsGroqKey">Groq API Key</label>
+                        <input type="password" id="settingsGroqKey" class="w-full h-11 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-xs text-sm" placeholder="Masked key - enter new key to overwrite"/>
+                    </div>
+                    <div class="space-y-xs">
+                        <label class="text-xs font-semibold text-on-surface-variant" for="settingsGeminiKey">Gemini API Key</label>
+                        <input type="password" id="settingsGeminiKey" class="w-full h-11 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-xs text-sm" placeholder="Masked key - enter new key to overwrite"/>
+                    </div>
+                    <button type="submit" class="w-full h-11 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-all">
+                        Update API Keys
+                    </button>
+                </form>
+
+                <!-- 2. Change Password Settings -->
+                <form id="settingsPasswordForm" onsubmit="saveSettingsPassword(event)" class="space-y-md pt-md border-t border-outline-variant/30">
+                    <h4 class="text-xs font-label-caps text-primary border-b border-gray-100 pb-1 uppercase">Change Account Password</h4>
+                    <div class="space-y-xs">
+                        <label class="text-xs font-semibold text-on-surface-variant" for="settingsOldPassword">Current Password</label>
+                        <input type="password" id="settingsOldPassword" class="w-full h-11 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-xs text-sm" placeholder="••••••••" required/>
+                    </div>
+                    <div class="space-y-xs">
+                        <label class="text-xs font-semibold text-on-surface-variant" for="settingsNewPassword">New Password</label>
+                        <input type="password" id="settingsNewPassword" class="w-full h-11 bg-surface-container rounded-lg border-transparent focus:border-primary focus:ring-0 px-md py-xs text-sm" placeholder="••••••••" required/>
+                    </div>
+                    <button type="submit" class="w-full h-11 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-all">
+                        Change Password
+                    </button>
+                </form>
+
+                <!-- 3. Danger Zone -->
+                <div class="space-y-md pt-md border-t border-outline-variant/30">
+                    <h4 class="text-xs font-label-caps text-red-600 border-b border-red-50 pb-1 uppercase">Danger Zone</h4>
+                    <p class="text-xs text-on-surface-variant">Permanently delete all chat histories from this account. This action is irreversible.</p>
+                    <button type="button" class="w-full h-11 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-semibold hover:bg-red-100 transition-all" onclick="deleteEntireChatHistory()">
+                        Delete Chat History
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================== -->
+    <!-- CONFIRMATION POPUP -->
+    <!-- ========================================================================== -->
+    <div
+        id="confirmationModal"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center p-md bg-black/40 backdrop-blur-sm"
+    >
+        <div
+            class="w-full max-w-[400px] bg-white border border-outline-variant rounded-2xl shadow-2xl p-xl animate-fade-in"
+        >
+            <div class="flex items-start gap-md">
+                <div class="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <span
+                        class="material-symbols-outlined text-primary"
+                        id="confirmationIcon"
+                    >
+                        help
+                    </span>
+                </div>
+
+                <div class="flex-1">
+                    <h3
+                        id="confirmationTitle"
+                        class="font-headline-md text-lg font-bold text-on-surface"
+                    >
+                        Confirm Action
+                    </h3>
+
+                    <p
+                        id="confirmationMessage"
+                        class="text-sm text-on-surface-variant mt-2 leading-relaxed"
+                    >
+                        Are you sure?
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-lg">
+                <button
+                    type="button"
+                    id="confirmationCancelBtn"
+                    class="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm font-semibold transition-all"
+                    onclick="closeConfirmationPopup()"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="button"
+                    id="confirmationConfirmBtn"
+                    class="px-5 py-2.5 bg-primary hover:bg-primary-container text-white rounded-lg text-sm font-semibold transition-all"
+                    onclick="confirmPopupAction()"
+                >
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/app.js"></script>
+</body>
+</html>

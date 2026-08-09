@@ -1,0 +1,2275 @@
+{
+  "name": "Delete Record Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "zoho-assistant",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1856,
+        224
+      ],
+      "id": "09c513cb-7dcb-49d9-8a30-cb276ece7933",
+      "name": "Webhook1",
+      "webhookId": "63313491-3cce-4fcf-95b1-948269dbe4c2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "b77fcecd-be7e-4f89-8929-f07b2090ea2d",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "get_leads",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "498be65a-87f2-419d-9451-e7dee4216710",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "get_deals",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "f8a81023-e29f-4318-912b-31bc9d87ac01",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "get_contacts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "f8a81023-e29f-4318-912b-31bc9d87ac02",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "get_accounts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "e8a81023-e29f-4318-912b-31bc9d87ac2b",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "get_record_by_id",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "f8a81023-e29f-4318-912b-31bc9d87ac2b",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "update_record",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "5e448e79-8015-44a8-a194-a082d4a5b6f0",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "delete_record",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "0fda438b-cf14-4d38-8723-0fad243c941e",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "create_record",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "a9a81023-e29f-4318-912b-31bc9d87ac2b",
+                    "leftValue": "={{$json.body.action}}",
+                    "rightValue": "test_connection",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2080,
+        112
+      ],
+      "id": "a0b1c994-4519-447a-a4b7-0225afc5503d",
+      "name": "Switch Action1"
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "operation": "getAll",
+        "limit": 200,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        672
+      ],
+      "id": "6e6e9fb1-f42d-459f-9251-519fbc4a2a0f",
+      "name": "Zoho CRM Leads1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "deal",
+        "operation": "getAll",
+        "limit": 200,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        928
+      ],
+      "id": "86e7b107-3833-4073-afec-3ad02f2bc8e8",
+      "name": "Zoho CRM Deals1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.data ? $json.data : $input.all().map(item => item.json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        608
+      ],
+      "id": "841f9b4c-f09b-4e12-9470-f412d285868d",
+      "name": "Respond Leads1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.data ? $json.data : $input.all().map(item => item.json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        864
+      ],
+      "id": "e9f34037-191c-4e8d-8147-5f4967514b1f",
+      "name": "Respond Deals1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        -240
+      ],
+      "id": "da62e352-c76b-4f4d-bab9-e3db0490b640",
+      "name": "Respond Test Connection1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || $json.body.payload?.name || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || $json.body.payload?.name || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        608
+      ],
+      "id": "0a6d198a-97f4-4cca-9bb0-4463c3746218",
+      "name": "Check Query Leads1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || $json.body.payload?.deal_name || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || $json.body.payload?.deal_name || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        864
+      ],
+      "id": "2a5d21a9-43df-4997-b7eb-27f0d3ce8901",
+      "name": "Check Query Deals1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || $json.body.payload?.email || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || $json.body.payload?.email || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        368
+      ],
+      "id": "e58903eb-64b0-4876-814b-0a210eaebb23",
+      "name": "Check Query Contacts1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.payload?.query || '' }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        112
+      ],
+      "id": "ae5344fe-c55f-448c-9fb0-6d065ad3664d",
+      "name": "Check Query Accounts1"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.zohoapis.in/crm/v2/Leads/search?word=' + encodeURIComponent($json.body.payload.query || $json.body.payload.name || '') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2656,
+        512
+      ],
+      "id": "9948a83b-2338-40a6-96e6-377d078cb533",
+      "name": "HTTP Request Search Leads1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.zohoapis.in/crm/v2/Deals/search?word=' + encodeURIComponent($json.body.payload.query || $json.body.payload.deal_name || '') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2656,
+        768
+      ],
+      "id": "e1f4a2ec-488f-4e7c-98ee-0f8ff5173d58",
+      "name": "HTTP Request Search Deals1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.zohoapis.in/crm/v2/Contacts/search?' + ( ($json.body.payload.query || '').includes('@') ? 'email=' + encodeURIComponent($json.body.payload.query) : ($json.body.payload.email ? 'email=' + encodeURIComponent($json.body.payload.email) : 'word=' + encodeURIComponent($json.body.payload.query || '')) ) }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2656,
+        288
+      ],
+      "id": "1b1e003a-78d2-40af-b0fe-ac7be7940097",
+      "name": "HTTP Request Search Contacts1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://www.zohoapis.in/crm/v2/Accounts/search?word=' + encodeURIComponent($json.body.payload.query || '') }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2656,
+        32
+      ],
+      "id": "153fa249-4f2e-4d6e-b43e-824de43dbe5c",
+      "name": "HTTP Request Search Accounts1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst data = (response && Array.isArray(response.data)) ? response.data : [];\nreturn [{ json: { data: data } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        512
+      ],
+      "id": "aab2874e-6504-412a-b22c-c196e7fd2177",
+      "name": "Extract Search Leads1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst data = (response && Array.isArray(response.data)) ? response.data : [];\nreturn [{ json: { data: data } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        768
+      ],
+      "id": "572ca254-e38b-4a30-bdcd-94274dffa0bd",
+      "name": "Extract Search Deals1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst data = (response && Array.isArray(response.data)) ? response.data : [];\nreturn [{ json: { data: data } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        288
+      ],
+      "id": "a63cd6b2-5c28-4ac3-aa7d-4d2138180b26",
+      "name": "Extract Search Contacts1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst data = (response && Array.isArray(response.data)) ? response.data : [];\nreturn [{ json: { data: data } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        32
+      ],
+      "id": "52c81571-f33a-460c-9154-d8d5da08a3a4",
+      "name": "Extract Search Accounts1"
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "getAll",
+        "limit": 200,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        416
+      ],
+      "id": "99760900-646a-4909-b19f-3b4e07ac48dc",
+      "name": "Zoho CRM Contacts1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.data ? $json.data : $input.all().map(item => item.json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        368
+      ],
+      "id": "9f9e5855-1d78-4f30-99d4-8d058b2c4b06",
+      "name": "Respond Contacts1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 200,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        160
+      ],
+      "id": "b3ff364e-9399-45f0-b14a-ad8a4048cea4",
+      "name": "Zoho CRM Accounts1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.data ? $json.data : $input.all().map(item => item.json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3056,
+        112
+      ],
+      "id": "33a371bd-29b5-4c5b-915a-768ecda14e64",
+      "name": "Respond Accounts1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Leads",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Contacts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Accounts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Deals",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        1168
+      ],
+      "id": "bbc13943-ff1a-4a38-9245-bd2401a006c1",
+      "name": "Switch Get Record Module1"
+    },
+    {
+      "parameters": {
+        "resource": "lead",
+        "operation": "get",
+        "leadId": "={{$json.body.payload.id}}"
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        1056
+      ],
+      "id": "1105c720-35a4-4fc9-a712-97b1e692d053",
+      "name": "Zoho CRM Get Lead1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "get",
+        "contactId": "={{$json.body.payload.id}}"
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        1152
+      ],
+      "id": "a840ee04-46b7-4b23-ae16-1be22a3410e5",
+      "name": "Zoho CRM Get Contact1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "accountId": "={{$json.body.payload.id}}"
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        1248
+      ],
+      "id": "2ec28e4b-68ed-43a4-898d-a9941d8bdf7d",
+      "name": "Zoho CRM Get Account1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "deal",
+        "operation": "get",
+        "dealId": "={{$json.body.payload.id}}"
+      },
+      "type": "n8n-nodes-base.zohoCrm",
+      "typeVersion": 1,
+      "position": [
+        2704,
+        1360
+      ],
+      "id": "6b6387c0-1c9c-41a7-88fd-1d77abe74629",
+      "name": "Zoho CRM Get Deal1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2944,
+        1200
+      ],
+      "id": "eea3d667-f372-4b64-aec0-a1f0934ae2ed",
+      "name": "Respond Get Record1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Leads",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Contacts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Accounts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Deals",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2464,
+        1616
+      ],
+      "id": "546160cf-4440-4feb-a330-eb83fa739318",
+      "name": "Switch Update Record Module1"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst input = $input.first().json;\nconst payload = input.body.payload;\n\nif (!payload.module) throw new Error(\"Missing module\");\nif (!payload.id) throw new Error(\"Missing record id\");\nif (!payload.field_name) throw new Error(\"Missing field name\");\nif (payload.value === undefined) throw new Error(\"Missing value\");\n\nconst apiPayload = {\n  data: [{ [payload.field_name]: payload.value }]\n};\n\nconst baseUrl = 'https://www.zohoapis.in';\nconst finalUrl = `${baseUrl}/crm/v2/${payload.module}/${payload.id}`;\n\nconst logObj = {\n  module: payload.module,\n  id: payload.id,\n  field_name: payload.field_name,\n  value: payload.value,\n  url: finalUrl,\n  request_body: apiPayload\n};\n\nconsole.log(\"[N8N UPDATE LOG]\", JSON.stringify(logObj));\n\nreturn {\n  json: {\n    ...input,\n    final_url: finalUrl,\n    api_payload: apiPayload,\n    log_data: logObj\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2656,
+        1616
+      ],
+      "id": "4671bb94-025e-4240-904c-823298fa5e63",
+      "name": "Prepare Zoho Update Payload1"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.final_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.api_payload) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2912,
+        1616
+      ],
+      "id": "f2859d7f-5922-4855-a70f-7085bbb1740c",
+      "name": "HTTP Request Zoho Update1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ['success', 'SUCCESS'].includes($json.data?.[0]?.status || $json.data?.[0]?.code || '') }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ['success', 'SUCCESS'].includes($json.data?.[0]?.status || $json.data?.[0]?.code || '') }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        3168,
+        1616
+      ],
+      "id": "0aea2887-1ca8-44fd-8b21-2d0ac6f81aac",
+      "name": "Check Update Success1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare Zoho Update Payload1').first().json.final_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3408,
+        1520
+      ],
+      "id": "1fd5063f-4880-4529-9292-2b797d07f717",
+      "name": "HTTP Request Get Fresh Record1",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst putResponse = $('HTTP Request Zoho Update1').first().json;\nconst inputParams = $('Prepare Zoho Update Payload1').first().json.log_data;\n\n// 1. Check for PUT HTTP/network error\nif (!putResponse || putResponse.error || (putResponse.statusCode && putResponse.statusCode >= 400)) {\n  return {\n    json: {\n      success: false,\n      error: putResponse?.message || putResponse?.error || `HTTP error ${putResponse?.statusCode || 'unknown'}`,\n      details: putResponse\n    }\n  };\n}\n\n// 2. Check for Zoho API authentication or general server errors\nif (putResponse.code && putResponse.code !== \"SUCCESS\" && !putResponse.data) {\n  return {\n    json: {\n      success: false,\n      error: putResponse.message || putResponse.code || \"Zoho CRM API error\",\n      details: putResponse\n    }\n  };\n}\n\nconst dataArray = putResponse.data;\nif (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) {\n  return {\n    json: {\n      success: false,\n      error: \"Invalid or empty response format from Zoho CRM\",\n      details: putResponse\n    }\n  };\n}\n\nconst recordResult = dataArray[0];\nif (recordResult.status !== \"success\" && recordResult.code !== \"SUCCESS\") {\n  return {\n    json: {\n      success: false,\n      error: recordResult.message || recordResult.code || \"Zoho CRM update failed\",\n      details: putResponse\n    }\n  };\n}\n\n// 3. Since PUT succeeded, check the GET request output\nlet getResponse = null;\ntry {\n  getResponse = $('HTTP Request Get Fresh Record1').first().json;\n} catch (e) {\n  // Node was not executed or threw error\n}\n\nif (!getResponse || getResponse.error || (getResponse.statusCode && getResponse.statusCode >= 400)) {\n  return {\n    json: {\n      success: true, // The update itself succeeded!\n      id: inputParams.id,\n      module: inputParams.module,\n      updated_field: inputParams.field_name,\n      new_value: inputParams.value,\n      updated_record: null,\n      error_fetching_fresh_record: getResponse?.message || getResponse?.error || \"HTTP error on GET\",\n      zoho_response: putResponse\n    }\n  };\n}\n\nconst getDataArray = getResponse.data;\nconst freshRecord = (getDataArray && getDataArray.length > 0) ? getDataArray[0] : null;\n\nreturn {\n  json: {\n    success: true,\n    id: inputParams.id,\n    module: inputParams.module,\n    updated_field: inputParams.field_name,\n    new_value: inputParams.value,\n    updated_record: freshRecord,\n    zoho_response: putResponse\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3664,
+        1616
+      ],
+      "id": "4299c982-884b-4d77-acc4-05a78f9fe148",
+      "name": "Format Update Response1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ json_encode($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3920,
+        1616
+      ],
+      "id": "61deb868-86da-44bd-b723-563a35fbaf88",
+      "name": "Respond Update Record1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Leads",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1d80f33d-16b5-4491-b4d5-17b3641203a9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Contacts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b60f0f14-7657-43ab-b042-b4efaa27cf84"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Accounts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8951d5b9-fd94-4abc-80ab-1ed0fff43899"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Deals",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2e12f221-b150-4ec6-937e-a2a17c10b460"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2432,
+        1968
+      ],
+      "id": "f2df4bba-f011-4dbb-8190-16dfae2059c3",
+      "name": "Switch Delete Record Module"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $('HTTP Request Zoho Delete').first().json;\n\nif (\n    response.data &&\n    response.data[0] &&\n    response.data[0].status === \"success\"\n) {\n    return {\n        json:{\n            success:true,\n            deleted:true,\n            message:response.data[0].message,\n            module:$('Prepare Zoho Delete Payload').first().json.body.payload.module,\n            id:$('Prepare Zoho Delete Payload').first().json.body.payload.id\n        }\n    };\n}\n\nreturn {\n    json:{\n        success:false,\n        deleted:false,\n        error:\n            response.data?.[0]?.message ||\n            response.message ||\n            \"Delete failed.\",\n        zoho_response:response\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3200,
+        1968
+      ],
+      "id": "28c02fff-ad5a-4f52-861b-98fd1d36abd3",
+      "name": "Format Delete Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ json_encode($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3456,
+        1968
+      ],
+      "id": "92e1c6d4-d635-45a5-8434-77c8ba46f585",
+      "name": "Respond Delete Record"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst payload = input.body.payload;\n\n// =====================\n// Validation\n// =====================\nif (!payload.module) {\n  throw new Error(\"Missing module\");\n}\n\nif (!payload.id) {\n  throw new Error(\"Missing record id\");\n}\n\n// =====================\n// Build URL\n// =====================\nconst baseUrl = \"https://www.zohoapis.in\";\nconst finalUrl = `${baseUrl}/crm/v2/${payload.module}/${payload.id}`;\n\n// =====================\n// Debug Log\n// =====================\nconst logObj = {\n  module: payload.module,\n  id: payload.id,\n  url: finalUrl\n};\n\nconsole.log(\"[N8N DELETE LOG]\");\nconsole.log(JSON.stringify(logObj, null, 2));\n\n// =====================\n// Return\n// =====================\nreturn {\n  json: {\n    ...input,\n    final_url: finalUrl,\n    log_data: logObj\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2672,
+        1968
+      ],
+      "id": "4f982168-f2f3-446b-94a5-1d20762f6ad7",
+      "name": "Prepare Zoho Delete Payload"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Leads",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1d80f33d-16b5-4491-b4d5-17b3641203a9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Contacts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b60f0f14-7657-43ab-b042-b4efaa27cf84"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Accounts",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8951d5b9-fd94-4abc-80ab-1ed0fff43899"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$json.body.payload.module}}",
+                    "rightValue": "Deals",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2e12f221-b150-4ec6-937e-a2a17c10b460"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        2416,
+        2240
+      ],
+      "id": "d4185b15-bc60-46fe-87d5-eb49caa23a0c",
+      "name": "Switch Create Module"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "={{ $json.final_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2880,
+        1968
+      ],
+      "id": "8c6bb54d-e339-4dd0-9643-d429c4a5b556",
+      "name": "HTTP Request Zoho Delete",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst payload = input.body.payload;\n\nif (!payload.module)\n    throw new Error(\"Missing module\");\n\nif (!payload.fields)\n    throw new Error(\"Missing fields\");\n\nconst baseUrl = \"https://www.zohoapis.in\";\nconst finalUrl = `${baseUrl}/crm/v2/${payload.module}`;\n\nconst apiPayload = {\n    data: [payload.fields]\n};\n\nconsole.log(\"[N8N CREATE LOG]\");\nconsole.log(JSON.stringify({\n    module: payload.module,\n    url: finalUrl,\n    body: apiPayload\n}, null, 2));\n\nreturn {\n    json: {\n        ...input,\n        final_url: finalUrl,\n        api_payload: apiPayload\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2688,
+        2288
+      ],
+      "id": "47d63ba6-0763-4cbf-ad1a-987de7083a3c",
+      "name": "Prepare Zoho Create Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.final_url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.api_payload) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        2896,
+        2288
+      ],
+      "id": "f9f89d0b-9f72-4999-8aab-bcedee2ffcd1",
+      "name": "HTTP Request Zoho Create",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ['success','SUCCESS'].includes($json.data?.[0]?.status || $json.data?.[0]?.code || '') }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "6cd0f0f0-1d93-48e8-b83f-233178d8b594"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ['success','SUCCESS'].includes($json.data?.[0]?.status || $json.data?.[0]?.code || '') }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "ad1f1738-c2c6-4eb4-899a-1a7316f8060c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        3136,
+        2288
+      ],
+      "id": "b6cab8b7-cb70-4dcc-804c-ccfd6f3512fb",
+      "name": "Check Create Success"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Response from Zoho Create API\nconst createResponse = $('HTTP Request Zoho Create').first().json;\n\n// Full created record (if GET succeeded)\nlet createdRecord = null;\n\ntry {\n    createdRecord = $('HTTP Request Get Created Record').first().json.data?.[0] || null;\n} catch (e) {\n    createdRecord = null;\n}\n\n// Create successful\nif (\n    createResponse.data &&\n    createResponse.data.length &&\n    (\n        createResponse.data[0].status === \"success\" ||\n        createResponse.data[0].code === \"SUCCESS\"\n    )\n) {\n\n    return {\n        json: {\n            success: true,\n            message: \"Record created successfully.\",\n            id: createResponse.data[0].details.id,\n            module: $('Prepare Zoho Create Payload').first().json.body.payload.module,\n\n            // Return full record if available, otherwise return create details\n            created_record: createdRecord || createResponse.data[0].details,\n\n            zoho_response: createResponse\n        }\n    };\n\n}\n\n// Create failed\nreturn {\n    json: {\n        success: false,\n\n        error:\n            createResponse.data?.[0]?.message ||\n            createResponse.message ||\n            \"Create failed.\",\n\n        zoho_response: createResponse\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        3712,
+        2272
+      ],
+      "id": "b19f7862-9e2b-402f-8c25-95099e8c0646",
+      "name": "Format Create Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        4064,
+        2240
+      ],
+      "id": "69ed6142-0c70-40dd-aedd-faecfb8e41aa",
+      "name": "Respond Create Record"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare Zoho Create Payload').first().json.final_url + \"/\" + $('HTTP Request Zoho Create').first().json.data[0].details.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "zohoOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        3424,
+        2192
+      ],
+      "id": "c39af6f4-1d97-4e9d-8313-240437ebdd39",
+      "name": "HTTP Request Get Created Record",
+      "credentials": {
+        "zohoOAuth2Api": {
+          "id": "HBK3UIvsIuJWEga5",
+          "name": "Zoho account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Switch Action1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Action1": {
+      "main": [
+        [
+          {
+            "node": "Check Query Leads1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Query Deals1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Query Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Query Accounts1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Get Record Module1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Update Record Module1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Delete Record Module",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch Create Module",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Test Connection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Leads1": {
+      "main": [
+        [
+          {
+            "node": "Respond Leads1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Deals1": {
+      "main": [
+        [
+          {
+            "node": "Respond Deals1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Query Leads1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Search Leads1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Leads1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Query Deals1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Search Deals1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Deals1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Query Contacts1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Search Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Query Accounts1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Search Accounts1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Accounts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Search Leads1": {
+      "main": [
+        [
+          {
+            "node": "Extract Search Leads1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Search Deals1": {
+      "main": [
+        [
+          {
+            "node": "Extract Search Deals1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Search Contacts1": {
+      "main": [
+        [
+          {
+            "node": "Extract Search Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Search Accounts1": {
+      "main": [
+        [
+          {
+            "node": "Extract Search Accounts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Search Leads1": {
+      "main": [
+        [
+          {
+            "node": "Respond Leads1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Search Deals1": {
+      "main": [
+        [
+          {
+            "node": "Respond Deals1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Search Contacts1": {
+      "main": [
+        [
+          {
+            "node": "Respond Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Search Accounts1": {
+      "main": [
+        [
+          {
+            "node": "Respond Accounts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Contacts1": {
+      "main": [
+        [
+          {
+            "node": "Respond Contacts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Accounts1": {
+      "main": [
+        [
+          {
+            "node": "Respond Accounts1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Get Record Module1": {
+      "main": [
+        [
+          {
+            "node": "Zoho CRM Get Lead1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Get Contact1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Get Account1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Zoho CRM Get Deal1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Get Lead1": {
+      "main": [
+        [
+          {
+            "node": "Respond Get Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Get Contact1": {
+      "main": [
+        [
+          {
+            "node": "Respond Get Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Get Account1": {
+      "main": [
+        [
+          {
+            "node": "Respond Get Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Zoho CRM Get Deal1": {
+      "main": [
+        [
+          {
+            "node": "Respond Get Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Update Record Module1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Zoho Update Payload1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Update Payload1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Update Payload1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Update Payload1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Zoho Update Payload1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Zoho Update1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Zoho Update1": {
+      "main": [
+        [
+          {
+            "node": "Check Update Success1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Update Success1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Get Fresh Record1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Update Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Get Fresh Record1": {
+      "main": [
+        [
+          {
+            "node": "Format Update Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Update Response1": {
+      "main": [
+        [
+          {
+            "node": "Respond Update Record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Delete Record Module": {
+      "main": [
+        [
+          {
+            "node": "Prepare Zoho Delete Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Delete Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Delete Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Delete Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Delete Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Delete Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Zoho Delete Payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Zoho Delete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Zoho Delete": {
+      "main": [
+        [
+          {
+            "node": "Format Delete Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Create Module": {
+      "main": [
+        [
+          {
+            "node": "Prepare Zoho Create Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Create Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Create Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Zoho Create Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Zoho Create Payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Zoho Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Zoho Create": {
+      "main": [
+        [
+          {
+            "node": "Check Create Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Create Success": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Get Created Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Create Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Create Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Create Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Get Created Record": {
+      "main": [
+        [
+          {
+            "node": "Format Create Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1ad30747-38ef-406c-b57e-33c79733ac11",
+  "meta": {
+    "instanceId": "cc699305c36e23d84eae7e354dc106f24fa369cd0ccfaa1768d156707f32b768"
+  },
+  "nodeGroups": [],
+  "id": "H5WFhG1IeJq9nU7G",
+  "tags": []
+}

@@ -1,0 +1,198 @@
+{
+  "models": {
+    "gemini-2.5-flash": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    },
+    "gemini-2.5-flash-lite": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    },
+    "gemma-4-26b-a4b-it": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 16384
+    },
+    "gemma-4-31b-it": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 32768
+    },
+    "groq/compound": {
+      "provider": "groq",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 128000
+    },
+    "groq/compound-mini": {
+      "provider": "groq",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 32768
+    },
+    "llama-3.1-8b-instant": {
+      "provider": "groq",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": false,
+      "max_context": 8192
+    },
+    "llama-3.3-70b-versatile": {
+      "provider": "groq",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 32768
+    },
+    "llama-4-scout-17b-16e-instruct": {
+      "provider": "groq",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 65536
+    },
+    "gemini-3-flash": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    },
+
+    "gemini-3.1-flash-lite": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    },
+
+    "gemini-3.5-flash": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    },
+
+    "gemini-3.5-flash-lite": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    },
+
+    "gemini-3.6-flash": {
+      "provider": "gemini",
+      "supports_stream": true,
+      "supports_json": true,
+      "supports_function_calling": true,
+      "max_context": 1048576
+    }
+  },
+
+  "tasks": {
+    "intent_classification": {
+      "required_capabilities": ["supports_json"],
+      "model_chain": [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "llama-3.1-8b-instant",
+        "groq/compound-mini"
+      ]
+    },
+    "crud_extraction": {
+      "required_capabilities": ["supports_json"],
+      "model_chain": [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "llama-3.1-8b-instant",
+        "groq/compound-mini"
+      ]
+    },
+    "analytics_interpretation": {
+      "required_capabilities": ["supports_json"],
+      "model_chain": [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "llama-3.1-8b-instant",
+        "groq/compound-mini"
+      ]
+    },
+    "general_crm": {
+      "required_capabilities": [],
+      "model_chain": [
+        "llama-3.3-70b-versatile",
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "llama-3.1-8b-instant",
+        "gemma-4-31b-it"
+      ]
+    },
+    "summaries": {
+      "required_capabilities": [],
+      "model_chain": [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+        "gemma-4-26b-a4b-it"
+      ]
+    },
+    "long_reports": {
+      "required_capabilities": [],
+      "model_chain": [
+        "gemini-3.6-flash",
+        "gemini-3.5-flash",
+        "gemini-3-flash",
+        "gemini-2.5-flash",
+        "llama-4-scout-17b-16e-instruct",
+        "gemma-4-31b-it"
+      ]
+    }
+  },
+  "providers": {
+    "gemini": {
+      "api_key_env": "GEMINI_API_KEY",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta"
+    },
+    "groq": {
+      "api_key_env": "GROQ_API_KEY",
+      "base_url": "https://api.groq.com/openai/v1"
+    }
+  }
+}
