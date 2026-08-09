@@ -60,9 +60,7 @@ class Settings(BaseSettings):
     # ==========================================================
     ZOHO_ACCOUNTS_URL: str = "https://accounts.zoho.in"
 
-    ZOHO_REDIRECT_URI: str = (
-        "https://sathwik.pythonanywhere.com/auth/zoho/callback"
-    )
+    ZOHO_REDIRECT_URI: str = ""
 
     # ==========================================================
     # Logging
