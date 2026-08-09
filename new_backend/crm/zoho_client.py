@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional
 
 import httpx
-
+PYTHONANYWHERE_PROXY = "http://proxy.server:3128"
 from new_backend.config.settings import settings
 from new_backend.repositories.zoho_oauth_repository import (
     ZohoOAuthRepository,
@@ -67,7 +67,7 @@ class ZohoCRMClient:
         try:
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.post(
@@ -222,7 +222,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.get(
@@ -258,7 +258,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.get(
@@ -320,7 +320,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.put(
@@ -356,7 +356,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.put(
@@ -417,7 +417,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.delete(
@@ -452,7 +452,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.delete(
@@ -513,7 +513,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.post(
@@ -549,7 +549,7 @@ class ZohoCRMClient:
 
             with httpx.Client(
                 timeout=20.0,
-                trust_env=False,
+                proxy=PYTHONANYWHERE_PROXY,
             ) as client:
 
                 response = client.post(
