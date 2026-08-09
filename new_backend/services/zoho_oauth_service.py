@@ -195,7 +195,7 @@ class ZohoOAuthService:
 
         async with httpx.AsyncClient(
             timeout=20.0,
-            trust_env=True,
+            proxy="http://proxy.server:3128",
         ) as client:
 
             response = await client.post(
