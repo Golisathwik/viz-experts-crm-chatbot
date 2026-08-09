@@ -61,7 +61,7 @@ class Settings(BaseSettings):
     ZOHO_ACCOUNTS_URL: str = "https://accounts.zoho.in"
 
     ZOHO_REDIRECT_URI: str = (
-        "http://127.0.0.1:8001/auth/zoho/callback"
+        "https://sathwik.pythonanywhere.com/auth/zoho/callback"
     )
 
     # ==========================================================
