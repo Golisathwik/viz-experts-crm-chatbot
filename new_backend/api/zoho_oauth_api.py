@@ -140,6 +140,6 @@ async def zoho_callback(
         return RedirectResponse(
             url=(
                 "/?zoho_error="
-                "authorization_failed"
+                + str(exc)
             )
         )
