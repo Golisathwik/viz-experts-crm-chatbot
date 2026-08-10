@@ -429,7 +429,7 @@
     <!-- ========================================================================== -->
     <div id="chatView" class="view-panel hidden flex h-screen w-full overflow-hidden">
         <!-- SIDEBAR -->
-        <aside class="w-[280px] bg-surface-container-low border-r border-outline-variant flex flex-col p-md overflow-hidden flex-shrink-0 h-full">
+        <aside id="chatSidebar" class="chat-sidebar w-[280px] bg-surface-container-low border-r border-outline-variant flex flex-col p-md overflow-hidden flex-shrink-0 h-full">
             <!-- Title Header -->
             <div class="mb-lg px-2 flex items-center gap-2">
                 <img src="/static/images/logo.jpg" alt="viz Experts" class="w-8 h-8 rounded object-cover shadow-sm"/>
@@ -466,13 +466,30 @@
             </div>
         </aside>
 
+        <!-- Mobile Sidebar Overlay -->
+        <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeChatSidebar()"></div>
+
         <!-- MAIN AREA -->
         <main class="flex-1 h-full flex flex-col relative overflow-hidden bg-background">
             
             <!-- Top bar -->
             <header class="h-16 border-b border-outline-variant/30 flex justify-between items-center px-lg bg-surface/80 backdrop-blur-md z-10 flex-shrink-0">
-                <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wider">AI RAG Sandbox</span>
+                <div class="flex items-center gap-3">
+                    <!-- ChatGPT/Gemini-style Sidebar Toggle -->
+                    <button
+                        type="button"
+                        id="sidebarToggleBtn"
+                        class="sidebar-toggle-btn"
+                        title="Toggle sidebar"
+                        aria-label="Toggle chat sidebar"
+                        onclick="toggleChatSidebar()"
+                    >
+                        <span class="material-symbols-outlined">menu</span>
+                    </button>
+
+                    <span class="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase tracking-wider">
+                        AI RAG Sandbox
+                    </span>
                 </div>
                 <div class="flex items-center gap-4">
                     <!-- Connections Status badges -->
@@ -566,45 +583,33 @@
             <!-- Bottom Prompt Input Area -->
             <div class="w-full flex flex-col items-center pb-8 px-md bg-gradient-to-t from-background via-background to-transparent flex-shrink-0">
                 <div class="max-w-[700px] w-full relative">
-                    <!-- File Attachment Preview Banner (Hidden by default) -->
-                    <div id="fileUploadPreview" class="hidden mb-2 bg-white border border-outline-variant rounded-xl p-3 flex items-center justify-between shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <span class="material-symbols-outlined text-primary" id="fileIcon">description</span>
-                            <div class="text-left">
-                                <p class="text-xs font-semibold text-on-surface truncate max-w-[400px]" id="fileNameLabel">file.pdf</p>
-                                <p class="text-[10px] text-on-surface-variant" id="fileSizeLabel">124 KB</p>
-                            </div>
-                        </div>
-                        <button class="text-on-surface-variant hover:text-red-500 p-1" onclick="clearFileAttachment()">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-
+        
                     <!-- Input Bar -->
                     <div class="bg-white border border-outline-variant/60 rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] focus-within:border-primary/30 transition-all p-2 max-w-[700px] w-full">
                         <form id="chatForm" class="flex items-center gap-2 p-0.5" onsubmit="handleChatSubmit(event)">
-                            <!-- Hidden inputs for file -->
-                            <input type="file" id="fileInput" class="hidden" accept=".pdf,.docx,.txt,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.webp" onchange="handleFileChange(event)"/>
-                            
-                            <!-- Left attachment action -->
-                            <button type="button" id="attachBtn" class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all flex-shrink-0" title="Upload File" onclick="document.getElementById('fileInput').click()">
-                                <span class="material-symbols-outlined text-[22px]">attach_file</span>
-                            </button>
                             
                             <!-- Textarea -->
                             <textarea class="flex-1 max-h-48 py-2 px-3 border-none focus:ring-0 font-body-lg text-body-lg resize-none placeholder:text-outline outline-none bg-transparent" placeholder="Ask about leads, deal status, pipeline..." rows="1" id="chatInputField" onkeydown="handleTextareaKeydown(event)"></textarea>
                             
-                            <!-- Recording Timer overlay (Hidden by default) -->
-                            <div id="recordingTimerOverlay" class="hidden flex items-center justify-between gap-4 px-5 py-1.5 bg-red-50/70 border border-red-200/80 rounded-full flex-1 h-10">
-                                <div class="flex items-center gap-2 text-red-600 font-semibold text-sm">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
-                                    <span>Recording</span>
-                                    <span id="recordingTimerValue" class="font-mono">00:00</span>
+                            <!-- Live Voice Waveform -->
+                            <div id="recordingTimerOverlay" class="hidden recording-waveform-container">
+                                <div class="recording-live-indicator">
+                                    <span class="recording-live-dot"></span>
+                                    <span>Listening</span>
                                 </div>
-                                <button type="button" class="flex items-center gap-1.5 px-4 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer" onclick="stopRecording()">
-                                    <span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">stop</span>
-                                    <span>Stop Recording</span>
-                                </button>
+
+                                <div
+                                    id="recordingWaveform"
+                                    class="recording-waveform"
+                                    aria-label="Live microphone waveform"
+                                ></div>
+
+                                <span
+                                    id="recordingTimerValue"
+                                    class="recording-time"
+                                >
+                                    00:00
+                                </span>
                             </div>
                             
                             <!-- Right actions -->

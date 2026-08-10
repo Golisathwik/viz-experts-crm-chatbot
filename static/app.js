@@ -9,12 +9,18 @@ let activeSessionId =
         ? parseInt(sessionStorage.getItem("active_session_id"))
         : null;
 let recognition = null;
-let selectedFile = null;
 let isRecording = false;
 let mediaRecorder = null;
 let audioChunks = [];
 let recordingInterval = null;
 let recordingSeconds = 0;
+
+/* Live microphone waveform */
+let audioContext = null;
+let analyserNode = null;
+let microphoneSource = null;
+let waveformAnimationId = null;
+let microphoneStream = null;
 let confirmationAction = null;
 const tableStates = {};
 
@@ -1327,6 +1333,39 @@ async function loadChatHistory() {
     }
 }
 
+/* =========================================================
+   CHAT SIDEBAR TOGGLE
+   ========================================================= */
+
+function toggleChatSidebar() {
+    const chatView = document.getElementById("chatView");
+
+    if (!chatView) return;
+
+    if (window.innerWidth <= 768) {
+        chatView.classList.toggle("sidebar-open");
+    } else {
+        chatView.classList.toggle("sidebar-collapsed");
+    }
+}
+
+
+function closeChatSidebar() {
+    const chatView = document.getElementById("chatView");
+
+    if (!chatView) return;
+
+    chatView.classList.remove("sidebar-open");
+}
+
+
+/* Close mobile sidebar when a chat is selected */
+function closeSidebarAfterChatSelection() {
+    if (window.innerWidth <= 768) {
+        closeChatSidebar();
+    }
+}
+
 async function selectChatSession(sessionId) {
     activeSessionId = sessionId;
     sessionStorage.setItem("active_session_id", sessionId);
@@ -1426,6 +1465,8 @@ async function selectChatSession(sessionId) {
     } catch (err) {
         console.error("Error loading chat session:", err);
     }
+
+    closeSidebarAfterChatSelection();
 }
 
 async function startNewChat() {
@@ -1453,7 +1494,6 @@ async function startNewChat() {
             item.classList.add("text-on-surface-variant");
         });
 
-    clearFileAttachment();
     document.getElementById("chatForm").reset();
 
     const input = document.getElementById("chatInputField");
@@ -1507,6 +1547,10 @@ function submitSuggestedPrompt(text) {
 
 // Microphone Speech Recognition
 // Microphone Speech Recording & Whisper Transcription Flow
+// ==============================================================================
+// LIVE MICROPHONE RECORDING + REAL-TIME WAVEFORM
+// ==============================================================================
+
 function toggleMicrophone() {
     if (isRecording) {
         stopRecording();
@@ -1515,155 +1559,674 @@ function toggleMicrophone() {
     }
 }
 
+
 async function startRecording() {
+
     const micBtn = document.getElementById("micBtn");
     const micIcon = document.getElementById("micIcon");
-    
+
     audioChunks = [];
     recordingSeconds = 0;
-    
-    // Check MediaDevices compatibility
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Your browser does not support audio recording. Please use a modern browser like Chrome, Edge, or Safari.");
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+        alert(
+            "Your browser does not support microphone recording. Please use Chrome, Edge, or Safari."
+        );
         return;
     }
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        
-        mediaRecorder = new MediaRecorder(stream);
-        
-        mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-                audioChunks.push(event.data);
+
+        microphoneStream =
+            await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+
+
+        /* ---------------------------------------------------------
+           MediaRecorder
+           --------------------------------------------------------- */
+
+        let mimeType = "audio/webm";
+
+        if (
+            !MediaRecorder.isTypeSupported(
+                "audio/webm;codecs=opus"
+            )
+        ) {
+            if (
+                MediaRecorder.isTypeSupported(
+                    "audio/webm"
+                )
+            ) {
+                mimeType = "audio/webm";
+            } else {
+                mimeType = "";
             }
-        };
-        
-        mediaRecorder.onstop = async () => {
-            // Stop stream tracks to release microphone hardware
-            stream.getTracks().forEach(track => track.stop());
-            
-            if (audioChunks.length === 0) {
-                alert("Recording failed: no audio chunks recorded.");
-                resetMicButtonState();
-                return;
-            }
-            
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            if (audioBlob.size === 0) {
-                alert("Recording is empty.");
-                resetMicButtonState();
-                return;
-            }
-            
-            // Send the audio file to the backend
-            await sendAudioToBackend(audioBlob);
-        };
-        
-        mediaRecorder.start();
+        }
+
+        mediaRecorder = mimeType
+            ? new MediaRecorder(
+                microphoneStream,
+                { mimeType }
+            )
+            : new MediaRecorder(
+                microphoneStream
+            );
+
+
+        mediaRecorder.ondataavailable =
+            (event) => {
+
+                if (event.data && event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+
+            };
+
+
+        mediaRecorder.onstop =
+            async () => {
+
+                /* Stop microphone hardware */
+                stopMicrophoneAnalyser();
+
+                if (microphoneStream) {
+
+                    microphoneStream
+                        .getTracks()
+                        .forEach(track => track.stop());
+
+                    microphoneStream = null;
+                }
+
+
+                if (audioChunks.length === 0) {
+
+                    resetMicButtonState();
+
+                    alert(
+                        "No audio was recorded. Please try again."
+                    );
+
+                    return;
+                }
+
+
+                const audioBlob =
+                    new Blob(
+                        audioChunks,
+                        {
+                            type:
+                                mediaRecorder.mimeType ||
+                                "audio/webm"
+                        }
+                    );
+
+
+                if (!audioBlob.size) {
+
+                    resetMicButtonState();
+
+                    alert(
+                        "The recording was empty. Please try again."
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * Send the actual recorded audio
+                 * to the existing Whisper backend.
+                 */
+                await sendAudioToBackend(audioBlob);
+
+            };
+
+
+        /*
+         * Request data periodically.
+         * This makes recording more reliable on
+         * different browsers.
+         */
+        mediaRecorder.start(250);
+
         isRecording = true;
-        
-        // UI Updates: turn red, change icon to stop
-        micBtn.classList.add("mic-recording");
-        micIcon.innerText = "stop";
-        micBtn.title = "Stop Recording";
-        
+
+
+        /* ---------------------------------------------------------
+           Recording UI
+           --------------------------------------------------------- */
+
+        if (micBtn) {
+            micBtn.classList.add("mic-recording");
+            micBtn.title = "Stop Recording";
+        }
+
+        if (micIcon) {
+            micIcon.innerText = "stop";
+        }
+
+
         showRecordingTimer();
-        
+
+
+        /*
+         * Start REAL microphone waveform.
+         */
+        startMicrophoneAnalyser(
+            microphoneStream
+        );
+
+
     } catch (err) {
-        console.error("Microphone access error:", err);
-        alert("Microphone permission denied or unavailable. Please enable mic access in your browser settings to dictate.");
+
+        console.error(
+            "Microphone access error:",
+            err
+        );
+
+        if (
+            err.name === "NotAllowedError" ||
+            err.name === "PermissionDeniedError"
+        ) {
+
+            alert(
+                "Microphone permission was denied. Please allow microphone access in your browser."
+            );
+
+        } else {
+
+            alert(
+                "Unable to access the microphone. Please check your microphone and browser permissions."
+            );
+
+        }
+
+        if (microphoneStream) {
+
+            microphoneStream
+                .getTracks()
+                .forEach(track => track.stop());
+
+            microphoneStream = null;
+        }
+
         resetMicButtonState();
     }
 }
+
 
 function stopRecording() {
-    if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-        isRecording = false;
-        
-        resetMicButtonState();
-        hideRecordingTimer();
+
+    if (!mediaRecorder || !isRecording) {
+        return;
     }
+
+    isRecording = false;
+
+    /*
+     * Stop recording first.
+     * onstop will send the audio to Whisper.
+     */
+    mediaRecorder.stop();
+
+    stopMicrophoneAnalyser();
+
+    hideRecordingTimer();
 }
+
 
 function resetMicButtonState() {
-    const micBtn = document.getElementById("micBtn");
-    const micIcon = document.getElementById("micIcon");
-    if (micBtn && micIcon) {
-        micBtn.classList.remove("mic-recording");
-        micIcon.innerText = "mic";
+
+    const micBtn =
+        document.getElementById("micBtn");
+
+    const micIcon =
+        document.getElementById("micIcon");
+
+
+    if (micBtn) {
+
+        micBtn.classList.remove(
+            "mic-recording",
+            "animate-spin"
+        );
+
+        micBtn.disabled = false;
+
         micBtn.title = "Voice Input";
     }
+
+
+    if (micIcon) {
+        micIcon.innerText = "mic";
+    }
+
+
     isRecording = false;
+
+    stopMicrophoneAnalyser();
 }
+
+
+/* =========================================================
+   RECORDING UI
+   ========================================================= */
 
 function showRecordingTimer() {
-    const overlay = document.getElementById("recordingTimerOverlay");
-    const textarea = document.getElementById("chatInputField");
-    const timerValue = document.getElementById("recordingTimerValue");
-    const attachBtn = document.getElementById("attachBtn");
-    const micBtn = document.getElementById("micBtn");
-    const sendBtn = document.getElementById("sendBtn");
-    
-    if (overlay && textarea) {
-        textarea.classList.add("hidden");
+
+    const overlay =
+        document.getElementById(
+            "recordingTimerOverlay"
+        );
+
+    const sendBtn =
+        document.getElementById(
+            "sendBtn"
+        );
+
+    const chatForm =
+        document.getElementById(
+            "chatForm"
+        );
+
+    const timerValue =
+        document.getElementById(
+            "recordingTimerValue"
+        );
+
+
+    if (overlay) {
         overlay.classList.remove("hidden");
     }
-    
-    if (attachBtn) {
-        attachBtn.disabled = true;
-        attachBtn.classList.add("opacity-50", "pointer-events-none");
-    }
-    if (micBtn) {
-        micBtn.classList.add("hidden");
-    }
-    if (sendBtn) {
-        sendBtn.classList.add("hidden");
-    }
-    
-    recordingSeconds = 0;
-    if (timerValue) {
-        timerValue.innerText = "00:00";
-    }
-    
-    recordingInterval = setInterval(() => {
-        recordingSeconds++;
-        const mins = String(Math.floor(recordingSeconds / 60)).padStart(2, "0");
-        const secs = String(recordingSeconds % 60).padStart(2, "0");
-        if (timerValue) {
-            timerValue.innerText = `${mins}:${secs}`;
-        }
-    }, 1000);
-}
 
-function hideRecordingTimer() {
-    const overlay = document.getElementById("recordingTimerOverlay");
-    const textarea = document.getElementById("chatInputField");
-    const attachBtn = document.getElementById("attachBtn");
-    const micBtn = document.getElementById("micBtn");
-    const sendBtn = document.getElementById("sendBtn");
-    
-    if (recordingInterval) {
-        clearInterval(recordingInterval);
-        recordingInterval = null;
+
+    if (chatForm) {
+        chatForm.classList.add(
+            "voice-recording"
+        );
     }
-    
-    if (overlay && textarea) {
-        overlay.classList.add("hidden");
-        textarea.classList.remove("hidden");
-        textarea.focus();
-    }
-    
-    if (attachBtn) {
-        attachBtn.disabled = false;
-        attachBtn.classList.remove("opacity-50", "pointer-events-none");
-    }
+
+
+    /*
+     * Keep the mic button visible.
+     * It becomes the small circular STOP button.
+     */
+    const micBtn =
+        document.getElementById("micBtn");
+
     if (micBtn) {
         micBtn.classList.remove("hidden");
     }
+
+
+    /*
+     * Send should not be available
+     * while recording.
+     */
+    if (sendBtn) {
+        sendBtn.classList.add("hidden");
+    }
+
+
+    recordingSeconds = 0;
+
+    if (timerValue) {
+        timerValue.innerText = "00:00";
+    }
+
+
+    if (recordingInterval) {
+        clearInterval(recordingInterval);
+    }
+
+
+    recordingInterval =
+        setInterval(() => {
+
+            recordingSeconds++;
+
+            const mins =
+                String(
+                    Math.floor(
+                        recordingSeconds / 60
+                    )
+                ).padStart(2, "0");
+
+            const secs =
+                String(
+                    recordingSeconds % 60
+                ).padStart(2, "0");
+
+
+            if (timerValue) {
+
+                timerValue.innerText =
+                    `${mins}:${secs}`;
+
+            }
+
+        }, 1000);
+}
+
+
+function hideRecordingTimer() {
+
+    const overlay =
+        document.getElementById(
+            "recordingTimerOverlay"
+        );
+
+
+    const sendBtn =
+        document.getElementById(
+            "sendBtn"
+        );
+
+    const chatForm =
+        document.getElementById(
+            "chatForm"
+        );
+
+
+    if (recordingInterval) {
+
+        clearInterval(
+            recordingInterval
+        );
+
+        recordingInterval = null;
+    }
+
+
+    if (overlay) {
+        overlay.classList.add("hidden");
+    }
+
+
+    if (chatForm) {
+
+        chatForm.classList.remove(
+            "voice-recording"
+        );
+    }
+
+
     if (sendBtn) {
         sendBtn.classList.remove("hidden");
+    }
+}
+
+
+/* =========================================================
+   REAL MICROPHONE WAVEFORM
+   ========================================================= */
+
+function createWaveformBars() {
+
+    const container =
+        document.getElementById(
+            "recordingWaveform"
+        );
+
+    if (!container) {
+        return;
+    }
+
+
+    container.innerHTML = "";
+
+
+    /*
+     * Create enough bars for desktop and mobile.
+     */
+    const barCount =
+        window.innerWidth <= 768
+            ? 28
+            : 48;
+
+
+    for (
+        let i = 0;
+        i < barCount;
+        i++
+    ) {
+
+        const bar =
+            document.createElement("span");
+
+        bar.className =
+            "recording-wave-bar";
+
+        container.appendChild(bar);
+    }
+}
+
+
+function startMicrophoneAnalyser(stream) {
+
+    stopMicrophoneAnalyser();
+
+    createWaveformBars();
+
+
+    try {
+
+        audioContext =
+            new (
+                window.AudioContext ||
+                window.webkitAudioContext
+            )();
+
+
+        analyserNode =
+            audioContext.createAnalyser();
+
+        analyserNode.fftSize = 256;
+
+        analyserNode.smoothingTimeConstant =
+            0.72;
+
+
+        microphoneSource =
+            audioContext.createMediaStreamSource(
+                stream
+            );
+
+        microphoneSource.connect(
+            analyserNode
+        );
+
+
+        const dataArray =
+            new Uint8Array(
+                analyserNode.frequencyBinCount
+            );
+
+
+        const bars =
+            document.querySelectorAll(
+                ".recording-wave-bar"
+            );
+
+
+        function drawWaveform() {
+
+            if (
+                !isRecording ||
+                !analyserNode
+            ) {
+                return;
+            }
+
+
+            analyserNode.getByteFrequencyData(
+                dataArray
+            );
+
+
+            /*
+             * Calculate average microphone volume.
+             */
+            let total = 0;
+
+            for (
+                let i = 0;
+                i < dataArray.length;
+                i++
+            ) {
+                total += dataArray[i];
+            }
+
+
+            const average =
+                total / dataArray.length;
+
+
+            const normalized =
+                Math.min(
+                    1,
+                    average / 55
+                );
+
+
+            bars.forEach(
+                (bar, index) => {
+
+                    /*
+                     * Use different frequency
+                     * portions for each bar.
+                     */
+                    const dataIndex =
+                        Math.floor(
+                            (
+                                index /
+                                bars.length
+                            ) *
+                            dataArray.length
+                        );
+
+
+                    const value =
+                        dataArray[
+                            Math.min(
+                                dataIndex,
+                                dataArray.length - 1
+                            )
+                        ] / 255;
+
+
+                    /*
+                     * Combine actual frequency
+                     * + overall microphone volume.
+                     */
+                    const level =
+                        Math.max(
+                            normalized * 0.65,
+                            value
+                        );
+
+
+                    /*
+                     * Small bars when quiet,
+                     * tall bars when speaking.
+                     */
+                    const height =
+                        Math.max(
+                            4,
+                            Math.min(
+                                30,
+                                4 +
+                                level * 26
+                            )
+                        );
+
+
+                    bar.style.height =
+                        `${height}px`;
+
+                }
+            );
+
+
+            waveformAnimationId =
+                requestAnimationFrame(
+                    drawWaveform
+                );
+        }
+
+
+        drawWaveform();
+
+
+    } catch (error) {
+
+        console.error(
+            "Waveform initialization failed:",
+            error
+        );
+
+        /*
+         * Recording itself continues even
+         * if waveform visualization fails.
+         */
+    }
+}
+
+
+function stopMicrophoneAnalyser() {
+
+    if (waveformAnimationId) {
+
+        cancelAnimationFrame(
+            waveformAnimationId
+        );
+
+        waveformAnimationId = null;
+    }
+
+
+    if (microphoneSource) {
+
+        try {
+            microphoneSource.disconnect();
+        } catch (_) {}
+
+        microphoneSource = null;
+    }
+
+
+    if (analyserNode) {
+        analyserNode = null;
+    }
+
+
+    if (audioContext) {
+
+        try {
+            audioContext.close();
+        } catch (_) {}
+
+        audioContext = null;
+    }
+
+
+    const container =
+        document.getElementById(
+            "recordingWaveform"
+        );
+
+    if (container) {
+        container.innerHTML = "";
     }
 }
 
@@ -1672,21 +2235,18 @@ async function sendAudioToBackend(audioBlob) {
     const micIcon = document.getElementById("micIcon");
     const inputField = document.getElementById("chatInputField");
     const sendBtn = document.getElementById("sendBtn");
-    const attachBtn = document.getElementById("attachBtn");
     
     // Set mic button to spin loading state
     if (micIcon && micBtn) {
-        micIcon.innerText = "sync";
+        micIcon.innerText = "progress_activity";
+        micBtn.classList.remove("mic-recording");
         micBtn.classList.add("animate-spin");
         micBtn.disabled = true;
+        micBtn.title = "Transcribing...";
     }
     if (sendBtn) {
         sendBtn.disabled = true;
         sendBtn.classList.add("opacity-50", "pointer-events-none");
-    }
-    if (attachBtn) {
-        attachBtn.disabled = true;
-        attachBtn.classList.add("opacity-50", "pointer-events-none");
     }
     
     const formData = new FormData();
@@ -1730,49 +2290,7 @@ async function sendAudioToBackend(audioBlob) {
             sendBtn.disabled = false;
             sendBtn.classList.remove("opacity-50", "pointer-events-none");
         }
-        if (attachBtn) {
-            attachBtn.disabled = false;
-            attachBtn.classList.remove("opacity-50", "pointer-events-none");
-        }
     }
-}
-
-// File Attachment handling
-function handleFileChange(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    selectedFile = file;
-
-    const preview = document.getElementById("fileUploadPreview");
-    const nameLabel = document.getElementById("fileNameLabel");
-    const sizeLabel = document.getElementById("fileSizeLabel");
-    const fileIcon = document.getElementById("fileIcon");
-
-    nameLabel.innerText = file.name;
-    sizeLabel.innerText = `${(file.size / 1024).toFixed(1)} KB`;
-
-    // Map extensions to icons
-    const ext = file.name.split(".").pop().toLowerCase();
-    if (["png", "jpg", "jpeg", "webp", "gif"].includes(ext)) {
-        fileIcon.innerText = "image";
-    } else if (["xlsx", "xls"].includes(ext)) {
-        fileIcon.innerText = "table_chart";
-    } else if (ext === "csv") {
-        fileIcon.innerText = "csv";
-    } else if (ext === "pdf") {
-        fileIcon.innerText = "picture_as_pdf";
-    } else {
-        fileIcon.innerText = "description";
-    }
-
-    preview.classList.remove("hidden");
-}
-
-function clearFileAttachment() {
-    selectedFile = null;
-    document.getElementById("fileInput").value = "";
-    document.getElementById("fileUploadPreview").classList.add("hidden");
 }
 
 // ==============================================================================
@@ -1789,17 +2307,12 @@ function handleTextareaKeydown(event) {
 
 function disableChatControls() {
     const sendBtn = document.getElementById("sendBtn");
-    const attachBtn = document.getElementById("attachBtn");
     const micBtn = document.getElementById("micBtn");
     const inputField = document.getElementById("chatInputField");
     
     if (sendBtn) {
         sendBtn.disabled = true;
         sendBtn.classList.add("opacity-50", "pointer-events-none");
-    }
-    if (attachBtn) {
-        attachBtn.disabled = true;
-        attachBtn.classList.add("opacity-50", "pointer-events-none");
     }
     if (micBtn) {
         micBtn.disabled = true;
@@ -1812,17 +2325,12 @@ function disableChatControls() {
 
 function enableChatControls() {
     const sendBtn = document.getElementById("sendBtn");
-    const attachBtn = document.getElementById("attachBtn");
     const micBtn = document.getElementById("micBtn");
     const inputField = document.getElementById("chatInputField");
     
     if (sendBtn) {
         sendBtn.disabled = false;
         sendBtn.classList.remove("opacity-50", "pointer-events-none");
-    }
-    if (attachBtn) {
-        attachBtn.disabled = false;
-        attachBtn.classList.remove("opacity-50", "pointer-events-none");
     }
     if (micBtn) {
         micBtn.disabled = false;
@@ -1840,7 +2348,7 @@ async function handleChatSubmit(event) {
     const input = document.getElementById("chatInputField");
     const prompt = input.value.trim().replace(/\n{3,}/g, "\n\n");
     
-    if (!prompt && !selectedFile) return;
+    if (!prompt) return;
 
     // Create a session only when sending the first message
 if (!activeSessionId) {
@@ -1866,14 +2374,8 @@ if (!activeSessionId) {
     input.style.height = "auto";
     document.getElementById("welcomePanel").classList.add("hidden");
 
-    // Form attachment prefix for bubble rendering
-    let fileBubblePrefix = "";
-    if (selectedFile) {
-        fileBubblePrefix = `📎 [File Attached: ${selectedFile.name}]\n\n`;
-    }
-
     // 1. Display User Message Bubble
-    appendMessageBubble("user", `${fileBubblePrefix}${prompt}`);
+    appendMessageBubble("user", prompt);
     scrollChatToBottom();
 
     // 2. Display typing animation bubble
@@ -1884,12 +2386,7 @@ if (!activeSessionId) {
     const formData = new FormData();
     formData.append("session_id", activeSessionId);
     formData.append("prompt", prompt);
-    if (selectedFile) {
-        formData.append("file", selectedFile);
-    }
 
-    // Clear file attachment inputs
-    clearFileAttachment();
     disableChatControls();
 
     let assistantBubbleId = null;
@@ -2368,8 +2865,6 @@ function regenerateBubble(bubbleId) {
         const b = bubbles[i];
         if (b.querySelector(".bubble-user")) {
             userPrompt = b.getAttribute("data-raw-message") || "";
-            // Clean file attachment prefix if present
-            userPrompt = userPrompt.replace(/📎 \[File Attached:[^\]]+\]\n\n/g, "").trim();
             break;
         }
     }
