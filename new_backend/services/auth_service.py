@@ -23,15 +23,23 @@ class AuthService:
     @staticmethod
     def signup(full_name: str, email: str, password: str):
 
-        existing_user = UserRepository.get_user_by_email(email)
+        email = email.strip().lower()
+
+        existing_user = UserRepository.get_user_by_email(
+            email
+        )
 
         if existing_user:
+
             return {
                 "success": False,
-                "message": "Email already registered."
+                "field": "email",
+                "message": "This email address already exists."
             }
 
-        password_hash = hash_password(password)
+        password_hash = hash_password(
+            password
+        )
 
         user_id = UserRepository.create_user(
             full_name=full_name,
@@ -40,14 +48,23 @@ class AuthService:
         )
 
         if not user_id:
+
             return {
                 "success": False,
-                "message": "Unable to create account."
+                "field": "email",
+                "message": "This email address already exists."
             }
+
+        token = create_access_token({
+            "user_id": user_id,
+            "email": email
+        })
 
         return {
             "success": True,
-            "message": "Account created successfully."
+            "message": "Your account has been created successfully.",
+            "token": token,
+            "full_name": full_name
         }
 
     @staticmethod
@@ -58,6 +75,7 @@ class AuthService:
         if not user:
             return {
                 "success": False,
+                "field": "email",
                 "message": "Invalid email or password."
             }
 
@@ -67,6 +85,7 @@ class AuthService:
         ):
             return {
                 "success": False,
+                "field": "password",
                 "message": "Invalid email or password."
             }
 

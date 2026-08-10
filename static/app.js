@@ -269,103 +269,425 @@ function updateConnectionStatusBadges(status) {
 }
 
 // ==============================================================================
+// PROFESSIONAL NOTIFICATION SYSTEM
+// ==============================================================================
+
+function showToast(type, title, message, duration = 4000) {
+    const container = document.getElementById("toastContainer");
+
+    if (!container) {
+        return;
+    }
+
+    const icons = {
+        success: "check_circle",
+        error: "error",
+        warning: "warning",
+        info: "info"
+    };
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <span class="material-symbols-outlined">
+                ${icons[type] || icons.info}
+            </span>
+        </div>
+
+        <div class="toast-content">
+            <div class="toast-title"></div>
+            <div class="toast-message"></div>
+        </div>
+
+        <button type="button" class="toast-close" aria-label="Close notification">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+
+        <div class="toast-progress"></div>
+    `;
+
+    toast.querySelector(".toast-title").textContent = title || "";
+    toast.querySelector(".toast-message").textContent = message || "";
+
+    toast.style.setProperty("--toast-duration", `${duration}ms`);
+
+    const closeToast = () => {
+        if (!toast.isConnected) {
+            return;
+        }
+
+        toast.classList.add("toast-removing");
+
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    };
+
+    toast.querySelector(".toast-close").addEventListener("click", closeToast);
+
+    container.appendChild(toast);
+
+    setTimeout(closeToast, duration);
+
+    return toast;
+}
+
+// ==============================================================================
 // AUTHENTICATION FLOW
 // ==============================================================================
 
 // Login Form Submit
+// Login Form Submit
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-    const errEl = document.getElementById("loginError");
+
+    const emailInput = document.getElementById("loginEmail");
+    const passwordInput = document.getElementById("loginPassword");
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    const emailError = document.getElementById("loginEmailError");
+    const passwordError = document.getElementById("loginPasswordError");
+
     const btn = document.getElementById("loginBtn");
 
-    errEl.classList.add("hidden");
+    // Clear previous validation errors
+    emailError.textContent = "";
+    passwordError.textContent = "";
+
+    emailError.classList.add("hidden");
+    passwordError.classList.add("hidden");
+
+    emailInput.classList.remove("border-error", "focus:border-error");
+    passwordInput.classList.remove("border-error", "focus:border-error");
+
     const origHtml = btn.innerHTML;
-    btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Logging in...`;
+
+    btn.innerHTML = `
+        <span class="material-symbols-outlined animate-spin text-sm">
+            sync
+        </span>
+        Logging in...
+    `;
+
     btn.disabled = true;
 
     try {
         const response = await fetch(`${API_URL}/auth/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
         });
 
         const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.detail || "Invalid login credentials");
+
+        // Authentication failed
+        if (!response.ok || data.success === false) {
+
+            if (data.field === "email") {
+
+                emailError.textContent =
+                    data.message || "Invalid email address.";
+
+                emailError.classList.remove("hidden");
+
+                emailInput.classList.add(
+                    "border-error",
+                    "focus:border-error"
+                );
+
+                emailInput.focus();
+
+            } else if (data.field === "password") {
+
+                passwordError.textContent =
+                    data.message || "Invalid password.";
+
+                passwordError.classList.remove("hidden");
+
+                passwordInput.classList.add(
+                    "border-error",
+                    "focus:border-error"
+                );
+
+                passwordInput.focus();
+
+            } else {
+
+                emailError.textContent =
+                    data.message || "Unable to sign in.";
+
+                emailError.classList.remove("hidden");
+            }
+
+            return;
         }
 
+        // Successful login
         token = data.token;
         userName = data.full_name;
+
         sessionStorage.setItem("auth_token", token);
         sessionStorage.setItem("user_name", userName);
 
+        btn.innerHTML = `
+            <span class="material-symbols-outlined text-sm">
+                check_circle
+            </span>
+            Success
+        `;
 
-        // Success animation
-        btn.innerHTML = `<span class="material-symbols-outlined text-sm">check_circle</span> Success`;
         btn.classList.add("bg-green-600");
-        
+
         setTimeout(() => {
             btn.innerHTML = origHtml;
             btn.classList.remove("bg-green-600");
             btn.disabled = false;
+
             checkAuthAndRoute();
-        }, 1000);
+        }, 700);
 
     } catch (err) {
-        errEl.innerText = err.message;
-        errEl.classList.remove("hidden");
-        btn.innerHTML = origHtml;
-        btn.disabled = false;
+
+        console.error("Login error:", err);
+
+        emailError.textContent =
+            "Unable to connect to the server. Please try again.";
+
+        emailError.classList.remove("hidden");
+
+    } finally {
+
+        if (!token) {
+            btn.innerHTML = origHtml;
+            btn.disabled = false;
+        }
     }
 });
 
 // Signup Form Submit
+// Signup Form Submit
 document.getElementById("signupForm").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const fullName = document.getElementById("signupName").value;
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    const confirmPassword = document.getElementById("signupConfirmPassword").value;
-    const errEl = document.getElementById("signupError");
-    const btn = document.getElementById("signupBtn");
 
+    const fullName =
+        document.getElementById("signupName").value.trim();
+
+    const emailInput =
+        document.getElementById("signupEmail");
+
+    const passwordInput =
+        document.getElementById("signupPassword");
+
+    const confirmPasswordInput =
+        document.getElementById("signupConfirmPassword");
+
+    const email =
+        emailInput.value.trim();
+
+    const password =
+        passwordInput.value;
+
+    const confirmPassword =
+        confirmPasswordInput.value;
+
+    const errEl =
+        document.getElementById("signupError");
+
+    const emailError =
+        document.getElementById("signupEmailError");
+
+    const btn =
+        document.getElementById("signupBtn");
+
+    // Clear previous errors
+    errEl.innerText = "";
     errEl.classList.add("hidden");
 
+    emailError.innerText = "";
+    emailError.classList.add("hidden");
+
+    emailInput.classList.remove(
+        "border-error",
+        "focus:border-error"
+    );
+
+    passwordInput.classList.remove(
+        "border-error",
+        "focus:border-error"
+    );
+
+    confirmPasswordInput.classList.remove(
+        "border-error",
+        "focus:border-error"
+    );
+
+    // Password confirmation validation
     if (password !== confirmPassword) {
-        errEl.innerText = "Passwords do not match.";
+
+        confirmPasswordInput.classList.add(
+            "border-error",
+            "focus:border-error"
+        );
+
+        errEl.innerText =
+            "Passwords do not match.";
+
         errEl.classList.remove("hidden");
+
+        confirmPasswordInput.focus();
+
         return;
     }
 
+    const originalHtml =
+        btn.innerHTML;
+
     btn.disabled = true;
 
+    btn.innerHTML = `
+        <span class="material-symbols-outlined animate-spin text-sm">
+            sync
+        </span>
+        Creating Account...
+    `;
+
     try {
-        const response = await fetch(`${API_URL}/auth/signup`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ full_name: fullName, email, password })
-        });
 
-        const data = await response.json();
-        if (!response.ok) {
-            throw new Error(data.detail || "Signup failed");
+        const response =
+            await fetch(`${API_URL}/auth/signup`, {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    full_name: fullName,
+                    email,
+                    password
+                })
+            });
+
+        const data =
+            await response.json();
+
+        // --------------------------------------------------
+        // DUPLICATE EMAIL / SIGNUP ERROR
+        // --------------------------------------------------
+
+        if (!response.ok || data.success === false) {
+
+            if (data.field === "email") {
+
+                emailError.innerText =
+                    data.message ||
+                    "This email address already exists.";
+
+                emailError.classList.remove(
+                    "hidden"
+                );
+
+                emailInput.classList.add(
+                    "border-error",
+                    "focus:border-error"
+                );
+
+                emailInput.focus();
+
+            } else {
+
+                errEl.innerText =
+                    data.message ||
+                    data.detail ||
+                    "Unable to create your account.";
+
+                errEl.classList.remove(
+                    "hidden"
+                );
+            }
+
+            return;
         }
-        
-        alert("Account created successfully!");
-        token = data.token;
-        userName = data.full_name;
-        sessionStorage.setItem("auth_token", token);
-        sessionStorage.setItem("user_name", userName);
 
+        // --------------------------------------------------
+        // SUCCESS
+        // --------------------------------------------------
 
-        checkAuthAndRoute();
+        token =
+            data.token;
+
+        userName =
+            data.full_name;
+
+        sessionStorage.setItem(
+            "auth_token",
+            token
+        );
+
+        sessionStorage.setItem(
+            "user_name",
+            userName
+        );
+
+        btn.innerHTML = `
+            <span class="material-symbols-outlined">
+                check_circle
+            </span>
+            Account Created
+        `;
+
+        btn.classList.add(
+            "bg-green-600"
+        );
+
+        // Show proper success popup
+        showSignupSuccessPopup(
+            data.message ||
+            "Your account has been created successfully."
+        );
+
     } catch (err) {
-        errEl.innerText = err.message;
-        errEl.classList.remove("hidden");
-        btn.disabled = false;
+
+        console.error(
+            "Signup error:",
+            err
+        );
+
+        errEl.innerText =
+            "Unable to connect to the server. Please try again.";
+
+        errEl.classList.remove(
+            "hidden"
+        );
+
+    } finally {
+
+        if (
+            !document
+                .getElementById("signupSuccessModal")
+                ?.classList.contains("hidden")
+        ) {
+            return;
+        }
+
+        btn.innerHTML =
+            originalHtml;
+
+        btn.classList.remove(
+            "bg-green-600"
+        );
+
+        btn.disabled =
+            false;
     }
 });
 
@@ -381,9 +703,17 @@ async function handleForgotPassword() {
             body: JSON.stringify({ email })
         });
         const data = await response.json();
-        alert(data.message);
+        showToast(
+            "success",
+            "Password recovery",
+            data.message || "Password recovery request processed successfully."
+        );
     } catch (err) {
-        alert("Failed to process password recovery simulation.");
+        showToast(
+            "error",
+            "Request failed",
+            "Unable to process password recovery. Please try again."
+        );
     }
 }
 
@@ -398,6 +728,44 @@ function togglePasswordVisibility(inputId, iconId) {
         input.type = "password";
         icon.innerText = "visibility";
     }
+}
+
+// ==============================================================================
+// SIGNUP SUCCESS POPUP
+// ==============================================================================
+
+function showSignupSuccessPopup(message) {
+
+    const modal =
+        document.getElementById("signupSuccessModal");
+
+    const messageEl =
+        document.getElementById("signupSuccessMessage");
+
+    if (!modal) {
+        return;
+    }
+
+    if (messageEl) {
+        messageEl.innerText =
+            message ||
+            "Your account has been created successfully.";
+    }
+
+    modal.classList.remove("hidden");
+}
+
+
+function closeSignupSuccessPopup() {
+
+    const modal =
+        document.getElementById("signupSuccessModal");
+
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+
+    checkAuthAndRoute();
 }
 
 function handleLogout(requireConfirmation = true) {
@@ -1126,6 +1494,15 @@ function fillSuggestedPrompt(text) {
     input.value = text;
     input.dispatchEvent(new Event("input")); // trigger auto-expand
     input.focus();
+}
+function submitSuggestedPrompt(text) {
+    fillSuggestedPrompt(text);
+
+    const chatForm = document.getElementById("chatForm");
+
+    if (chatForm) {
+        chatForm.requestSubmit();
+    }
 }
 
 // Microphone Speech Recognition

@@ -317,10 +317,138 @@ class ConversationController:
                 "query": {},
             }
         # --------------------------------------------------
-        # Selected Record Follow-up
+        # Selected-record direct commands
         # --------------------------------------------------
+        # When a CRM record is already selected, these commands
+        # must stay attached to that record.
+        #
+        # IMPORTANT:
+        # Handle these BEFORE QueryUnderstanding so that:
+        #
+        #   Show Phone Number -> Add More
+        #   Show Phone Number -> Change Phone Number
+        #   Show Phone Number -> Change Email ID
+        #
+        # cannot become a new global search.
+        # --------------------------------------------------
+
+        lower_prompt = " ".join(prompt.strip().lower().split())
+
+        selected_record_available = (
+            isinstance(state.get("selected_record_data"), dict)
+            or isinstance(state.get("selected_record"), dict)
+        )
+
+        selected_change_field = None
+
+        if selected_record_available:
+
+            # ----------------------------------------------
+            # Selected record -> Phone update
+            # ----------------------------------------------
+            if (
+                lower_prompt in {
+                    "change phone",
+                    "change phone number",
+                    "update phone",
+                    "update phone number",
+                }
+                or lower_prompt.startswith("change phone to ")
+                or lower_prompt.startswith("change phone number to ")
+                or lower_prompt.startswith("update phone to ")
+                or lower_prompt.startswith("update phone number to ")
+            ):
+                selected_change_field = "Phone"
+
+            # ----------------------------------------------
+            # Selected record -> Email update
+            # ----------------------------------------------
+            elif (
+                lower_prompt in {
+                    "change email",
+                    "change email id",
+                    "change email address",
+                    "update email",
+                    "update email id",
+                    "update email address",
+                }
+                or lower_prompt.startswith("change email to ")
+                or lower_prompt.startswith("change email id to ")
+                or lower_prompt.startswith("change email address to ")
+                or lower_prompt.startswith("update email to ")
+                or lower_prompt.startswith("update email id to ")
+                or lower_prompt.startswith("update email address to ")
+            ):
+                selected_change_field = "Email"
+
+
+        # ----------------------------------------------
+        # Selected record -> Add More
+        # ----------------------------------------------
+        if selected_record_available and lower_prompt in {
+            "add more",
+            "add more fields",
+            "more fields",
+            "show more",
+            "show more fields",
+            "remaining fields",
+            "additional fields",
+            "show additional fields",
+        }:
+
+            understanding = {
+                "operation": "selected_record_followup",
+                "module": (
+                    state.get("selected_record_module")
+                    or state.get("current_module")
+                ),
+                "search": {},
+                "update": {},
+            }
+
+
+        # ----------------------------------------------
+        # Selected record -> Change Phone / Email
+        # ----------------------------------------------
+        elif selected_change_field:
+
+            understanding = {
+                "operation": "update",
+                "module": (
+                    state.get("selected_record_module")
+                    or state.get("current_module")
+                ),
+                "search": {},
+                "update": {
+                    "field_name": selected_change_field,
+                    "new_value": None,
+                    "target_record": None,
+                },
+            }
+
+        else:
+            understanding = None
+
+
+        # --------------------------------------------------
+        # Normal QueryUnderstanding
+        # --------------------------------------------------
+
         print("=" * 60)
         print("ENTERING QUERY UNDERSTANDING")
+        print("PROMPT =", prompt)
+        print("=" * 60)
+
+        if understanding is None:
+
+            understanding = QueryUnderstanding.understand_query(
+                prompt,
+                current_module=state.get("current_module")
+            )
+
+        print("=" * 60)
+        print("UNDERSTANDING =", understanding)
+        print("=" * 60)
         print("PROMPT =", prompt)
         print("=" * 60)
         understanding = QueryUnderstanding.understand_query(
@@ -333,10 +461,42 @@ class ConversationController:
 
         if (
             understanding["operation"] == "selected_record_field"
-            and state.get("selected_record")
+            and (
+                state.get("selected_record_data")
+                or state.get("selected_record")
+            )
         ):
 
-            record = state["selected_record"]
+            # Always prefer the complete CRM record.
+            # selected_record may only contain the display name.
+            record = (
+                state.get("selected_record_data")
+                if isinstance(state.get("selected_record_data"), dict)
+                else state.get("selected_record")
+            )
+
+            # Safety check: field follow-up requires a full record dictionary.
+            if not isinstance(record, dict):
+                return {
+                    "success": False,
+                    "operation": "selected_record_field",
+                    "module": state.get("current_module"),
+                    "response": {
+                        "summary": "The selected record details are no longer available. Please select the record again.",
+                        "kpis": None,
+                        "table": None,
+                        "chart": None,
+                        "suggestions": [],
+                    },
+                    "records": [],
+                    "table": None,
+                    "chart": None,
+                    "kpis": None,
+                    "summary": "The selected record details are no longer available. Please select the record again.",
+                    "suggestions": [],
+                    "pagination": None,
+                    "query": {},
+                }
 
             field = understanding["search"]["field"]
 
@@ -1423,11 +1583,11 @@ class ConversationController:
                         "table": None,
                         "chart": None,
                         "kpis": None,
-                        "suggestions": [
-                            f"Edit {module[:-1]}",
-                            f"Delete {module[:-1]}",
-                            f"Update {module[:-1]}"
-                        ]
+                        "suggestions": ResponseGeneration.generate_suggestions(
+                            query="",
+                            module=real_module,
+                            records=[record],
+                        )
                     }
                     
                     # Save user selection

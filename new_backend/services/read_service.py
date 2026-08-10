@@ -113,7 +113,11 @@ class ReadService:
                             "kpis": None,
                             "table": None,
                             "chart": None,
-                            "suggestions": [],
+                            "suggestions": ResponseGeneration.generate_suggestions(
+                                query=query,
+                                module=CacheService.get_state(session_id)["current_module"],
+                                records=[navigation["record"]],
+                            ),
                         },
                         "records": [navigation["record"]],
                         "pagination": PaginationService.get_metadata(session_id),
@@ -291,8 +295,11 @@ class ReadService:
 
             if len(records) == 1:
                 kpis = None
+
                 state["selected_record"] = records[0]
+                state["selected_record_data"] = records[0]
                 state["selected_record_id"] = records[0].get("id")
+                state["selected_record_module"] = module
                 
             else:
                 kpis = self.visualization.build_kpis(
@@ -475,8 +482,13 @@ class ReadService:
                 state["pending_record_selection"] = None
                 state["pending_records"] = []
                 state["current_module"] = module
+
                 state["selected_record"] = records[0]
+                state["selected_record_data"] = records[0]
                 state["selected_record_id"] = records[0].get("id")
+                state["selected_record_module"] = (
+                    records[0].get("_module") or module
+                )
             
             if module == "All":
                 module = "Global Search"

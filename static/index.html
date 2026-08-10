@@ -124,7 +124,6 @@
 
             <!-- Card Form -->
             <div class="w-full glass-panel auth-card rounded-xl p-xl">
-                <div id="loginError" class="error-banner hidden mb-md"></div>
                 <form id="loginForm" class="space-y-lg">
                     <!-- Email Field -->
                     <div class="space-y-xs">
@@ -135,6 +134,11 @@
                             </div>
                             <input class="w-full h-12 pl-11 pr-md bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-body-lg text-body-lg outline-none" id="loginEmail" placeholder="name@company.com" required type="email"/>
                         </div>
+                        <p
+                            id="loginEmailError"
+                            class="hidden text-sm text-error mt-1 px-xs"
+                            aria-live="polite"
+                        ></p>
                     </div>
                     <!-- Password Field -->
                     <div class="space-y-xs">
@@ -148,6 +152,11 @@
                                 <span class="material-symbols-outlined text-[20px]" id="loginPassIcon">visibility</span>
                             </button>
                         </div>
+                        <p
+                            id="loginPasswordError"
+                            class="hidden text-sm text-error mt-1 px-xs"
+                            aria-live="polite"
+                        ></p>
                     </div>
                     <!-- Login Button -->
                     <button class="w-full h-14 bg-primary text-on-primary font-headline-md text-body-lg rounded-lg shadow-md hover:bg-primary-container hover:shadow-lg transition-all transform active:scale-[0.98] mt-sm flex items-center justify-center gap-sm" type="submit" id="loginBtn">
@@ -193,7 +202,11 @@
                     <h2 class="font-headline-md text-headline-md text-on-surface">Create your account</h2>
                     <p class="font-body-sm text-body-sm text-on-surface-variant mt-base">Get instant insights from your leads and deals</p>
                 </div>
-                <div id="signupError" class="error-banner hidden mb-md"></div>
+                <div
+                    id="signupError"
+                    class="hidden text-sm text-error px-xs mb-md"
+                    aria-live="polite"
+                ></div>
                 <form id="signupForm" class="space-y-md">
                     <!-- Full Name -->
                     <div class="space-y-base">
@@ -210,6 +223,11 @@
                             <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">mail</span>
                             <input class="w-full h-14 pl-12 pr-4 bg-surface-container-lowest border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-outline-variant" id="signupEmail" placeholder="john.doe@company.com" required type="email"/>
                         </div>
+                        <p
+                            id="signupEmailError"
+                            class="hidden text-sm text-error mt-1 px-xs"
+                            aria-live="polite"
+                        ></p>
                     </div>
                     <!-- Password Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
@@ -488,34 +506,55 @@
 
                     <!-- Prompt Suggestion Chips -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-10 text-left">
-                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('Show all leads')">
+
+                        <!-- Show all leads -->
+                        <button
+                            class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group"
+                            onclick="submitSuggestedPrompt('Show all leads')"
+                        >
                             <span class="material-symbols-outlined text-primary">groups</span>
                             <div>
                                 <p class="font-body-sm text-body-sm font-semibold">Show all leads</p>
-                                <p class="text-[11px] text-on-surface-variant">Review top sales prospects</p>
+                                <p class="text-[11px] text-on-surface-variant">View all leads</p>
                             </div>
                         </button>
-                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('Show open deals')">
+
+                        <!-- Show all deals -->
+                        <button
+                            class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group"
+                            onclick="submitSuggestedPrompt('Show all deals')"
+                        >
                             <span class="material-symbols-outlined text-primary">trending_up</span>
                             <div>
-                                <p class="font-body-sm text-body-sm font-semibold">Show open deals</p>
-                                <p class="text-[11px] text-on-surface-variant">Review deals in progress</p>
+                                <p class="font-body-sm text-body-sm font-semibold">Show all deals</p>
+                                <p class="text-[11px] text-on-surface-variant">View all deals</p>
                             </div>
                         </button>
-                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('Pipeline summary')">
-                            <span class="material-symbols-outlined text-primary">analytics</span>
+
+                        <!-- Show all accounts -->
+                        <button
+                            class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group"
+                            onclick="submitSuggestedPrompt('Show all accounts')"
+                        >
+                            <span class="material-symbols-outlined text-primary">business</span>
                             <div>
-                                <p class="font-body-sm text-body-sm font-semibold">Pipeline summary</p>
-                                <p class="text-[11px] text-on-surface-variant">Check value across pipeline stages</p>
+                                <p class="font-body-sm text-body-sm font-semibold">Show all accounts</p>
+                                <p class="text-[11px] text-on-surface-variant">View all accounts</p>
                             </div>
                         </button>
-                        <button class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group" onclick="fillSuggestedPrompt('CRM statistics')">
-                            <span class="material-symbols-outlined text-primary">emoji_events</span>
+
+                        <!-- Show all contacts -->
+                        <button
+                            class="flex items-center gap-3 p-4 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/5 rounded-xl transition-all group"
+                            onclick="submitSuggestedPrompt('Show all contacts')"
+                        >
+                            <span class="material-symbols-outlined text-primary">contacts</span>
                             <div>
-                                <p class="font-body-sm text-body-sm font-semibold">CRM statistics</p>
-                                <p class="text-[11px] text-on-surface-variant">Show counts, win rates & deal averages</p>
+                                <p class="font-body-sm text-body-sm font-semibold">Show all contacts</p>
+                                <p class="text-[11px] text-on-surface-variant">View all contacts</p>
                             </div>
                         </button>
+
                     </div>
                 </div>
 
@@ -682,6 +721,55 @@
     </div>
 
     <!-- ========================================================================== -->
+    <!-- ACCOUNT CREATION SUCCESS POPUP -->
+    <!-- ========================================================================== -->
+    <div
+        id="signupSuccessModal"
+        class="fixed inset-0 z-[110] hidden flex items-center justify-center p-md bg-black/40 backdrop-blur-sm"
+    >
+        <div
+            class="w-full max-w-[420px] bg-white border border-outline-variant rounded-2xl shadow-2xl p-xl animate-fade-in"
+        >
+            <div class="flex flex-col items-center text-center">
+
+                <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-lg">
+                    <span
+                        class="material-symbols-outlined text-green-600 text-4xl"
+                        style="font-variation-settings: 'FILL' 1;"
+                    >
+                        check_circle
+                    </span>
+                </div>
+
+                <h3
+                    class="font-headline-md text-xl font-bold text-on-surface"
+                >
+                    Account Created Successfully
+                </h3>
+
+                <p
+                    id="signupSuccessMessage"
+                    class="text-sm text-on-surface-variant mt-3 leading-relaxed"
+                >
+                    Your account has been created successfully.
+                </p>
+
+                <button
+                    type="button"
+                    class="w-full h-12 mt-lg bg-primary hover:bg-primary-container text-white rounded-lg text-sm font-semibold transition-all active:scale-[0.98]"
+                    onclick="closeSignupSuccessPopup()"
+                >
+                    Continue
+                    <span class="material-symbols-outlined align-middle text-[18px] ml-1">
+                        arrow_forward
+                    </span>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================================== -->
     <!-- CONFIRMATION POPUP -->
     <!-- ========================================================================== -->
     <div
@@ -739,6 +827,10 @@
             </div>
         </div>
     </div>
+    <!-- ========================================================================== -->
+    <!-- PROFESSIONAL NOTIFICATION TOAST -->
+    <!-- ========================================================================== -->
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Scripts -->
     <script src="/static/app.js"></script>
